@@ -4,6 +4,7 @@
  * Part of this code came from https://github.com/Twinklebear/TwinklebearDev-Lessons
  *
  */
+
 #ifndef SDL2_HEADER_H
 #define SDL2_HEADER_H
 #include <SDL2/SDL.h>

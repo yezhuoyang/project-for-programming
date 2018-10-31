@@ -7,7 +7,6 @@
 const std::string Game::TitleName = "Not A Simple Game Demo";
 const int Game::SCREEN_WIDTH	= 640;
 const int Game::SCREEN_HEIGHT	= 480;
-
 using namespace Game;
 
 std::map<int, bool> keyboard;
@@ -16,6 +15,9 @@ std::map<int, bool> keyboard;
 
 PointD posPlayer, velocityPlayer;
 PointD posEnemy[10];
+PointD posBullet[1000],velocityBullet;
+int bulletnumber;//已经打出的子弹数目
+
 double speedPlayer;
 
 Image *imagePlayer, *imageBullet, *imageEnemy, *images[100];
@@ -32,7 +34,9 @@ void initialize()
 	FPS_DISPLAY = true;
 	posPlayer = PointD( SCREEN_WIDTH/2, SCREEN_HEIGHT/2 );
 	posEnemy[0] = posPlayer;
-	speedPlayer = 5;
+	velocityBullet= PointD(0,-5);
+	speedPlayer=5;
+	bulletnumber=0;
 	canvasColor = {0, 0, 0, 255};
 	loadPictures();
 }
@@ -52,13 +56,12 @@ void drawBackground()
 
 	//	Pay attention: (Color){255,255,0} means (Color){255,255,0,0}
 	//	and means you will draw nothing
-
 	drawRect( rect, true );
 
 }
 void drawForeground()
 {
-	Rect rect = {200, 176, 85, 100};
+	Rect rect = {400, 0, 85, 800};//画一块颜色,左边界，上边界，右边界 ，下边界
 	setPenColor((Color){0, 255, 0, 200});
 	drawRect( rect, true );
 }
@@ -71,11 +74,16 @@ void drawHint()
 	drawImage( text, SCREEN_WIDTH-h/2-w/2, SCREEN_HEIGHT/2-h/2, 1, 1, 90+180 );
 	cleanup(text);
 }
+
 void drawBullet()
 {
-
+   for(int i=0;i<bulletnumber;++i){
+	drawImage( imageBullet, posBullet[i].x, posBullet[i].y, 0.5, 0.5 );
+   }
 }
+
 int lastAnime = 0;
+
 void drawEnemy()
 {
 	int w,h;
@@ -88,16 +96,21 @@ void drawEnemy()
 
 void draw()
 {
-	drawBackground();
+	//drawBackground();
 	drawPlayer();
 	drawBullet();
 	drawEnemy();
-	drawForeground();
+	//drawForeground();
 	drawHint();
 }
 void deal()
 {
+    bool shoot=false;
 	bool move = false;
+	if(keyboard['k'])
+    {
+        shoot=true;
+    }
 	if( keyboard[KEY_UP]	|| keyboard['w'] )
 	{
 		velocityPlayer = velocityPlayer + PointD(0,-1)*speedPlayer;
@@ -118,13 +131,34 @@ void deal()
 		velocityPlayer = velocityPlayer + PointD(+1,0)*speedPlayer;
 		move = true;
 	}
-
 	double len = velocityPlayer.length();
 	if( len > speedPlayer )
 	{
 		velocityPlayer = velocityPlayer/len*speedPlayer;
 	}
-	posPlayer = posPlayer + velocityPlayer;
+
+
+	for(int i=0;i<=bulletnumber-1;++i){
+        posBullet[i]=posBullet[i] + velocityBullet;
+        if(-posBullet[i].y>SCREEN_WIDTH){
+            std::cout<<"Bulletout!"<<std::endl;
+            --bulletnumber;
+        }
+	}
+
+	if(shoot){
+       ++bulletnumber;
+       posBullet[bulletnumber-1]=posPlayer;
+	}
+
+    if(posPlayer.x+ velocityPlayer.x<0||posPlayer.y+velocityPlayer.y<0||posPlayer.y+velocityPlayer.y>SCREEN_HEIGHT||
+       posPlayer.x+ velocityPlayer.x>SCREEN_WIDTH){
+        velocityPlayer=velocityPlayer*0;
+    }
+	else{
+    posPlayer = posPlayer + velocityPlayer;
+	}
+
 	if(!move)
 	{
 		velocityPlayer = velocityPlayer * 0.8;
@@ -171,7 +205,6 @@ void keyUp()
 
 void finale()
 {
-
 	cleanup( imagePlayer, imageBullet, imageEnemy);
 	for( int i = 0; i < 100; ++i )
 		cleanup( images[i] );

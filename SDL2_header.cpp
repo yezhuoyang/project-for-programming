@@ -1,7 +1,6 @@
 #include "res_path.h"
 #include "pointd.h"
 #include "SDL2_header.h"
-
 // -------------res_path.h------------
 std::string getResourcePath(const std::string &subDir){
 #ifdef _WIN32
@@ -40,11 +39,8 @@ double dot( const PointD &a, const PointD &b )
 
 
 namespace Game {
-
-
 SDL_Renderer	*renderer	= NULL;
 SDL_Window		*window		= NULL;
-
 bool FPS_DISPLAY	= false;
 double nowFPS;
 double duration		= 0;
@@ -61,15 +57,11 @@ int pmouseY = -1;
 bool keyPressed = false;
 int keyValue;
 
-
 const unsigned int FPS_RATE = 60;
 const std::string RES_PATH_IMG	= getResourcePath("image");
 const std::string RES_PATH_FONT = getResourcePath("fonts");
-
-
 std::string	fontName = "msyh";
 int			fontSize = 25;
-
 uint8_t lastColor[4];
 
 /*
@@ -88,6 +80,7 @@ void logSDLError(std::ostream &os, const std::string &msg){
  * @param ren The renderer to load the texture onto
  * @return the loaded texture, or nullptr if something went wrong.
  */
+
 SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren){
 	SDL_Texture *texture = IMG_LoadTexture(ren, file.c_str());
 	if (texture == nullptr){
@@ -105,6 +98,7 @@ SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren){
  * @param clip The sub-section of the texture to draw (clipping rect)
  *		default of nullptr draws the entire texture
  */
+
 void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, SDL_Rect dst,
 				   const double &angle, const SDL_Point *center,
 				   const SDL_RendererFlip &flip,
@@ -112,6 +106,7 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, SDL_Rect dst,
 {
 	SDL_RenderCopyEx(ren, tex, clip, &dst, angle, center, flip );
 }
+
 /*
  * Draw an SDL_Texture to an SDL_Renderer at position x, y, preserving
  * the texture's width and height and taking a clip of the texture if desired
@@ -123,6 +118,7 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, SDL_Rect dst,
  * @param clip The sub-section of the texture to draw (clipping rect)
  *		default of nullptr draws the entire texture
  */
+
 void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y,
 				   const double &widthRate,	const double &heightRate,
 				   const double &angle, const SDL_Point *center,
@@ -142,6 +138,7 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y,
 	}
 	renderTexture(tex, ren, dst, angle, center, flip, clip);
 }
+
 /*
  * Render the message we want to display to a texture for drawing
  * @param message The message we want to display
@@ -150,6 +147,7 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y,
  * @param fontSize The size we want the font to be
  * @return An SDL_Texture containing the rendered message, or nullptr if something went wrong
  */
+
 SDL_Texture* renderText(const std::string &message, const std::string &fontFile, SDL_Color color,
 		int fontSize, SDL_Renderer *renderer)
 {
@@ -187,7 +185,6 @@ Image* textToImage( const std::string &msg,
 	return renderText(msg, RES_PATH_FONT + fontType + ".ttf", color, size, renderer);
 }
 
-
 /*
  * Loads an image
  * @param file The image file to load
@@ -198,7 +195,7 @@ Image* loadImage( const std::string &file )
 	return loadTexture( RES_PATH_IMG +file, renderer );
 }
 
-void setImageAlpha( Image *img, Uint8 alpha )
+void setImageAlpha(Image *img,Uint8 alpha)
 {
 	SDL_SetTextureAlphaMod( img, alpha );
 }
@@ -215,21 +212,20 @@ void setImageAlpha( Image *img, Uint8 alpha )
  * @param clip		The subsection of the picture to display.
  * @return NULL
  */
-void drawImage(Image *img, int x, int y,
+ void drawImage(Image *img, int x, int y,
 			   const double &widthRate,	const double &heightRate,
 			   const double &angle, const Point *center,
 			   const FlipType &flip,
 			   const Rect *clip)
 {
 	SDL_Renderer *ren = renderer;
-	renderTexture( img, ren, x, y, widthRate, heightRate, angle, center, flip, clip );
+	renderTexture( img, ren, x, y, widthRate, heightRate,angle,center,flip,clip);
 }
 
 void getImageSize( Image *img, int &width, int &height )
 {
 	SDL_QueryTexture( img, NULL, NULL, &width, &height );
 }
-
 
 void setPenColor( const uint8_t &r, const uint8_t &g, const uint8_t &b, const uint8_t &a)
 {
@@ -239,6 +235,7 @@ void setPenColor( const uint8_t &r, const uint8_t &g, const uint8_t &b, const ui
 	lastColor[3] = a;
 	SDL_SetRenderDrawColor( renderer, r, g, b, a );
 }
+
 void setPenColor( const Color &color )
 {
 	setPenColor( color.r, color.g, color.b, color.a );
@@ -248,6 +245,7 @@ void drawPoint( int x, int y )
 {
 	SDL_RenderDrawPoint( renderer, x, y );
 }
+
 void drawPoint( const Point& p )
 {
 	drawPoint( p.x, p.y );
@@ -257,6 +255,7 @@ void drawLine( int x1, int y1, int x2, int y2 )
 {
 	SDL_RenderDrawLine( renderer, x1, y1, x2, y2 );
 }
+
 void drawLine( const Point &p1 ,const Point &p2 )
 {
 	drawLine( p1.x, p1.y, p2.x, p2.y );
@@ -267,15 +266,13 @@ void drawLines(const SDL_Point* points, int count)
 	SDL_RenderDrawLines( renderer, points, count );
 }
 
-void drawRect( const Rect& rect, const bool& fill )
+void drawRect(const Rect& rect, const bool& fill)
 {
 	if( !fill )
 		SDL_RenderDrawRect( renderer, &rect );
 	else
 		SDL_RenderFillRect( renderer, &rect );
 }
-
-
 
 void setCanvas( int x, int y, int width, int height )
 {
@@ -285,14 +282,13 @@ void setCanvas( int x, int y, int width, int height )
 
 // ---------------------------------------------------
 
-void drawText( const std::string &msg, const int &x, const int &y,
-			   const int32_t &size, const Color &color )
+void drawText(const std::string &msg, const int &x, const int &y,
+			   const int32_t &size, const Color &color)
 {
 	Image *image = textToImage(msg, size, color);
-
 	//Get the texture w/h so we can center it in the screen
 	int iW, iH;
-	getImageSize(image, iW, iH);
+	getImageSize(image,iW,iH);
 	drawImage(image, x, y);
 	cleanup(image);
 }
@@ -301,24 +297,18 @@ void drawText( const std::string &msg, const int &x, const int &y,
 
 
 int main(int argc, char* args[]) {
-
 	using namespace Game;
-
-
 	//Start up SDL and make sure it went ok
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		logSDLError(std::cout, "SDL_Init");
 		return 1;
 	}
-
 	//Also need to init SDL_ttf
-	if (TTF_Init() != 0){
+	if (TTF_Init()!= 0){
 		logSDLError(std::cout, "TTF_Init");
 		SDL_Quit();
 		return 1;
 	}
-
-
 	//Setup our window and renderer
 	window = SDL_CreateWindow(TitleName.c_str(), SDL_WINDOWPOS_CENTERED,
 			SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL|SDL_WINDOW_SHOWN);
@@ -336,22 +326,17 @@ int main(int argc, char* args[]) {
 		SDL_Quit();
 		return 1;
 	}
-
 	initialize();
-
 	double deltaTime, delta, oneStepTime = 1./FPS_RATE;
 	unsigned int t0, t1;
 	int returnValue;
 	SDL_Event event;
 	bool quit = false;
-
-
 	t0 = SDL_GetTicks();
 	SDL_SetRenderDrawBlendMode( renderer, SDL_BLENDMODE_BLEND );
-	while( !quit )
+	while(!quit)
 	{
-
-		while ( SDL_PollEvent( &event ) )
+		while (SDL_PollEvent(&event))
 		{
 			switch (event.type)
 			{
@@ -402,47 +387,38 @@ int main(int argc, char* args[]) {
 					break;
 			}
 		}
-
-		returnValue = work( quit );
-
+		returnValue = work( quit );//先deal()，判断飞机是否移动，更新速度位置
+                                   //然后draw()，更新画面
+                                   //最后看是否按Esc退出
 		t1 = SDL_GetTicks();
 		delta = t1 - t0;
 		t0 = t1;
 		deltaTime = delta / 1000.0;
-
 		if (delta < oneStepTime*1000) {
 			SDL_Delay(oneStepTime*1000 - delta);
 			deltaTime = oneStepTime;
 		}
-		duration = duration + deltaTime;
+		duration = duration + deltaTime;   //总共经过的时间
 		duration_i++;
-
-
 		//Display Fps
 		nowFPS = 1.0 / deltaTime;
-		if( FPS_DISPLAY )
+		if(FPS_DISPLAY)
 		{
 			char info[20];
 			sprintf(info, "FPS: %2d", (int)(nowFPS + 0.5));
 			drawText( info, 0, 0 );
 		}
-
 		//Draw the renderer
 		setPenColor(canvasColor);
 		SDL_RenderPresent(renderer);
 		setPenColor(lastColor[0],lastColor[1],lastColor[2],lastColor[3]);
 		SDL_RenderClear(renderer);
-	}
-
-
+}
 	finale();
-
-	cleanup( window, renderer );
-
+	cleanup( window, renderer);
 	IMG_Quit();
 	TTF_Quit();
 	SDL_Quit();
-
 	return returnValue;
 }
 
