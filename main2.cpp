@@ -14,9 +14,9 @@ std::map<int, bool> keyboard;
 
 
 PointD posPlayer, velocityPlayer;
-PointD posEnemy[10];
-PointD posBullet[1000],velocityBullet;
-int bulletnumber;//已经打出的子弹数目
+std::vector <PointD> posEnemy(10);
+std::vector <PointD> posBullet(10);
+PointD velocityBullet;
 
 double speedPlayer;
 
@@ -36,7 +36,6 @@ void initialize()
 	posEnemy[0] = posPlayer;
 	velocityBullet= PointD(0,-5);
 	speedPlayer=5;
-	bulletnumber=0;
 	canvasColor = {0, 0, 0, 255};
 	loadPictures();
 }
@@ -53,12 +52,11 @@ void drawBackground()
 {
 	Rect rect = {70, 50, 80, 90};
 	setPenColor((Color){255, 255, 0, 255});
-
 	//	Pay attention: (Color){255,255,0} means (Color){255,255,0,0}
 	//	and means you will draw nothing
 	drawRect( rect, true );
-
 }
+
 void drawForeground()
 {
 	Rect rect = {400, 0, 85, 800};//画一块颜色,左边界，上边界，右边界 ，下边界
@@ -77,13 +75,10 @@ void drawHint()
 
 void drawBullet()
 {
-   for(int i=0;i<bulletnumber;++i){
-	drawImage( imageBullet, posBullet[i].x, posBullet[i].y, 0.5, 0.5 );
-   }
+   for(std::vector<PointD>::iterator iter=posBullet.begin();iter!=posBullet.end();++iter)
+	  drawImage(imageBullet, (*iter).x, (*iter).y, 0.5, 0.5 );
 }
-
 int lastAnime = 0;
-
 void drawEnemy()
 {
 	int w,h;
@@ -137,19 +132,19 @@ void deal()
 		velocityPlayer = velocityPlayer/len*speedPlayer;
 	}
 
-
-	for(int i=0;i<=bulletnumber-1;++i){
-        posBullet[i]=posBullet[i] + velocityBullet;
-        if(-posBullet[i].y>SCREEN_WIDTH){
+   for(std::vector<PointD>::iterator iter=posBullet.begin();iter!=posBullet.end();++iter)
+	{
+	     *iter=*iter+ velocityBullet;
+        if(-(*iter).y>SCREEN_WIDTH){
+            posBullet.erase(iter);
             std::cout<<"Bulletout!"<<std::endl;
-            --bulletnumber;
         }
 	}
 
 	if(shoot){
-       ++bulletnumber;
-       posBullet[bulletnumber-1]=posPlayer;
+       posBullet.push_back(posPlayer);
 	}
+
 
     if(posPlayer.x+ velocityPlayer.x<0||posPlayer.y+velocityPlayer.y<0||posPlayer.y+velocityPlayer.y>SCREEN_HEIGHT||
        posPlayer.x+ velocityPlayer.x>SCREEN_WIDTH){
@@ -165,7 +160,6 @@ void deal()
 		if( velocityPlayer.length() < 0.1 )
 			velocityPlayer = PointD();
 	}
-
 	posEnemy[0] = PointD( mouseX, mouseY );
 }
 
@@ -173,7 +167,6 @@ int work( bool &quit )
 {
 	deal();
 	draw();
-
 	if( keyboard[KEY_ESC] )
 		quit = true;
 	return 0;

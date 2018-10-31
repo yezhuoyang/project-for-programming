@@ -16,6 +16,8 @@
 #include <cmath>
 #include <algorithm>
 #include <string>
+#include <vector>
+
 
 #include "cleanup.h"
 #include "res_path.h"

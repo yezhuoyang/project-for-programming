@@ -1,6 +1,7 @@
 #include "res_path.h"
 #include "pointd.h"
 #include "SDL2_header.h"
+
 // -------------res_path.h------------
 std::string getResourcePath(const std::string &subDir){
 #ifdef _WIN32
