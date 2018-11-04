@@ -405,7 +405,7 @@ int main(int argc, char* args[]) {
 
 
 		//第一种生成敌人的尝试，每隔1000帧生成一个敌人
-		if(duration_i%1000==1){
+		if(duration_i%100==1){
             newEnemy();
 		}
 

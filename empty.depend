@@ -383,7 +383,7 @@
 	"pointd.h"
 	"SDL2_header.h"
 
-1541256691 source:d:\empty\project-for-programming\sdl2_header.cpp
+1541331796 source:d:\empty\project-for-programming\sdl2_header.cpp
 	"res_path.h"
 	"pointd.h"
 	"SDL2_header.h"
@@ -726,10 +726,10 @@
 	"begin_code.h"
 	"close_code.h"
 
-1541255969 d:\empty\project-for-programming\pointd.h
+1541331796 d:\empty\project-for-programming\pointd.h
 	<cmath>
 
-1541256431 d:\empty\project-for-programming\sdl2_header.h
+1541331796 d:\empty\project-for-programming\sdl2_header.h
 	<SDL2/SDL.h>
 	<SDL2/SDL_ttf.h>
 	<SDL2/SDL_image.h>
@@ -758,7 +758,7 @@
 	<utility>
 	<SDL2/SDL.h>
 
-1541328672 source:d:\empty\project-for-programming\main2.cpp
+1541334230 source:d:\empty\project-for-programming\main2.cpp
 	"SDL2_header.h"
 	<cstdio>
 	<map>

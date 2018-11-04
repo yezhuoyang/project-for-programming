@@ -9,20 +9,21 @@ const int Game::SCREEN_HEIGHT	= 480;//长度,y坐标
 using namespace Game;
 std::map<int, bool> keyboard;
 PointD posPlayer, velocityPlayer;
-std::vector <PointD> posEnemy(10);
-std::vector <PointD> posBullet(10);
-std::vector <PointD> EnemyBullet(100);//用于存放敌人子弹
+std::vector <PointD> posEnemy={};
+std::vector <PointD> posBullet={};
+std::vector <PointD> EnemyBullet={};//用于存放敌人子弹
 
 
 PointD velocityBullet;
 PointD velocityEnemyBullet;
 
 double speedPlayer;
-double radiusPlayer=5,radiusEnemy=5;//玩家飞机与敌机的半径
+double radiusPlayer=5,radiusEnemy=50;//玩家飞机与敌机的半径
 double lifeofPlayer;//玩家的生命值
 double lifeofEnemy;//玩家的生命值
 double powerofPlayer;//玩家子弹的攻击力
 double powerofEnemy;//敌人子弹的攻击力
+double powerofCollide;//任意两个物体相撞的伤害值
 
 
 Image *imagePlayer, *imageBullet, *imageEnemy, *images[100],*imageEnemyBullet;
@@ -32,7 +33,7 @@ void loadPictures()
 	imagePlayer = loadImage( "player.png" );
 	imageBullet = loadImage( "bullet.png" );
 	imageEnemyBullet=loadImage("bullet.png");//敌人子弹图像
-	imageEnemy=loadImage( "enemy.png" );
+	imageEnemy=loadImage( "player.png" );
 }
 
 void initialize()
@@ -44,6 +45,7 @@ void initialize()
 	lifeofEnemy=10;//敌人初始生命值
 	lifeofPlayer=10;//玩家初始生命值
 	powerofPlayer=10;//玩家子弹的攻击力
+	powerofCollide=100;
 	powerofEnemy=1;//玩家子弹的攻击力
 	speedPlayer=5;
 	canvasColor = {0, 0, 0, 255};
@@ -63,7 +65,7 @@ void drawPlayer()
 //判断是否发生碰撞
 
 bool collide(PointD A,double RA,PointD B,double RB){
-    return false;//(B-A).length()<=(RA+RB);
+    return (B-A).length()<=(RA+RB);
 }
 
 
@@ -111,8 +113,18 @@ int lastAnime = 0;
 
 void drawEnemy()
 {
-   for(std::vector<PointD>::iterator iter=posEnemy.begin();iter!=posEnemy.end();++iter)
-	  drawImage(imageEnemy, (*iter).x, (*iter).y, 0.5, 0.5 );
+
+   int w=10,h=10;
+   for(std::vector<PointD>::iterator iter=posEnemy.begin();iter!=posEnemy.end();++iter){
+        /*
+          getImageSize( imageEnemy, w, h );
+	      lastAnime = (lastAnime+15)%(4*60);
+          Rect clip = {w/16*(lastAnime/60), 0, w/16,h/16};
+	      setImageAlpha( imageEnemy, 255 );
+        */
+          //Rect clip = {w/16*(lastAnime/60), 0, w/16,h/16};
+	      drawImage(imageEnemy, (*iter).x,(*iter).y, 0.5,0.5);
+   }
 
 /*
 	int w,h;
@@ -126,9 +138,10 @@ void drawEnemy()
 
 //此函数用于生成敌人
 void  newEnemy(){
+    std::cout<<"create a new enemy"<<std::endl;
     PointD newposition;
     newposition.x=(rand()%640);
-    newposition.y=0;
+    newposition.y=10;
     newposition.life=lifeofEnemy;
     posEnemy.push_back(newposition);
 }
@@ -147,8 +160,10 @@ void deal()
 {
     bool shoot=false;
 	bool move = false;
+	PointD tmp;
 	if(keyboard['k'])
     {
+
         shoot=true;
     }
 	if( keyboard[KEY_UP]	|| keyboard['w'] )
@@ -172,43 +187,58 @@ void deal()
 		move = true;
 	}
 	double len = velocityPlayer.length();
+
 	if( len > speedPlayer )
 	{
 		velocityPlayer = velocityPlayer/len*speedPlayer;
 	}
 
+
    for(std::vector<PointD>::iterator iter=posBullet.begin();iter!=posBullet.end();++iter)
 	{
         *iter=*iter+ velocityBullet;
-        //如果超出屏幕，就把子弹的内存释放掉
-        if(-(*iter).y>SCREEN_WIDTH){
-            posBullet.erase(iter);
-            std::cout<<"Bulletout!"<<std::endl;
-        }
-        //判断每颗玩家的子弹否与某个敌人相碰撞
         for(std::vector<PointD>::iterator iter2=posEnemy.begin();iter2!=posEnemy.end();++iter2)
         {
             if(collide(*iter,0,*iter2,radiusEnemy))
             {
                 //如果碰撞，则将子弹去除，待加碰撞效果
-                posBullet.erase(iter);
+                (*iter).life-=powerofCollide;
                 (*iter2).life-=powerofPlayer;
                 std::cout<<"Shoot!"<<std::endl;
             }
         }
+        //判断每颗玩家的子弹否与某个敌人相碰撞
 	}
 
+
+for(std::vector<PointD>::iterator iter=posBullet.begin();iter!=posBullet.end();)
+	{
+	        //如果超出屏幕，或者子弹的生命小于0，就把子弹的内存释放掉
+                if(-(*iter).y>SCREEN_WIDTH||(*iter).life<0){
+                    std::cout<<"Bullet out"<<std::endl;
+                    posBullet.erase(iter);
+                }
+                else{
+                    iter++;
+                }
+	}
 	//除去被击毁的地机
-    for(std::vector<PointD>::iterator iter=posEnemy.begin();iter!=posEnemy.end();++iter)
+    for(std::vector<PointD>::iterator iter=posEnemy.begin();iter!=posEnemy.end();)
     {
         if((*iter).life<0){
+            std::cout<<"Enemy out"<<std::endl;
             posEnemy.erase(iter);
+        }
+        else{
+             iter++;
         }
     }
 
     //如果按了射击键，则生成一个新的子弹
 	if(shoot){
-       posBullet.push_back(posPlayer);
+       tmp=posPlayer;
+       tmp.life=1;
+       posBullet.push_back(tmp);
 	}
 
     //判断玩家是否触游戏边界
