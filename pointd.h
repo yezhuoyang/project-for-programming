@@ -12,6 +12,7 @@ struct PointD
 	PointD( const double &X=0, const double &Y=0 )
 		:x(X),y(Y){}
 	double x,y;
+	double life;
 	double length() const
 	{
 		return sqrt(x*x+y*y);

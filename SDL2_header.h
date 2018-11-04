@@ -208,6 +208,7 @@ void drawText( const std::string &msg, const int &x, const int &y,
 
 // Functions for programming
 extern void initialize();
+extern void newEnemy();
 extern int	work( bool & );
 extern void mousePress();
 extern void mouseMove();

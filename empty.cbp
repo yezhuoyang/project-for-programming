@@ -34,11 +34,11 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
-			<Add directory="../2018级程序设计B班大作业-游戏开发“雷电”/SDL2plus-windows/include" />
+			<Add directory="SDL2plus-windows/include" />
 		</Compiler>
 		<Linker>
 			<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image" />
-			<Add directory="../2018级程序设计B班大作业-游戏开发“雷电”/SDL2plus-windows/lib" />
+			<Add directory="SDL2plus-windows/lib" />
 		</Linker>
 		<Unit filename="SDL2_header.cpp" />
 		<Unit filename="SDL2_header.h" />

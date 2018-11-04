@@ -391,6 +391,7 @@ int main(int argc, char* args[]) {
 		returnValue = work( quit );//先deal()，判断飞机是否移动，更新速度位置
                                    //然后draw()，更新画面
                                    //最后看是否按Esc退出
+
 		t1 = SDL_GetTicks();
 		delta = t1 - t0;
 		t0 = t1;
@@ -401,6 +402,14 @@ int main(int argc, char* args[]) {
 		}
 		duration = duration + deltaTime;   //总共经过的时间
 		duration_i++;
+
+
+		//第一种生成敌人的尝试，每隔1000帧生成一个敌人
+		if(duration_i%1000==1){
+            newEnemy();
+		}
+
+
 		//Display Fps
 		nowFPS = 1.0 / deltaTime;
 		if(FPS_DISPLAY)
