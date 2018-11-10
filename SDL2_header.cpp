@@ -4,6 +4,7 @@
 
 // -------------res_path.h------------
 std::string getResourcePath(const std::string &subDir){
+
 #ifdef _WIN32
 	const char PATH_SEP = '\\';
 #else
@@ -280,9 +281,7 @@ void setCanvas( int x, int y, int width, int height )
 	SDL_Rect rect = {x,y,x+width,y+height};
 	SDL_RenderSetViewport( renderer, &rect );
 }
-
 // ---------------------------------------------------
-
 void drawText(const std::string &msg, const int &x, const int &y,
 			   const int32_t &size, const Color &color)
 {
@@ -293,9 +292,7 @@ void drawText(const std::string &msg, const int &x, const int &y,
 	drawImage(image, x, y);
 	cleanup(image);
 }
-
 }
-
 
 int main(int argc, char* args[]) {
 	using namespace Game;
@@ -392,7 +389,7 @@ int main(int argc, char* args[]) {
                                    //然后draw()，更新画面
                                    //最后看是否按Esc退出
 
-		t1 = SDL_GetTicks();
+		t1 = SDL_GetTicks();//总时间，单位为毫秒
 		delta = t1 - t0;
 		t0 = t1;
 		deltaTime = delta / 1000.0;
@@ -403,13 +400,10 @@ int main(int argc, char* args[]) {
 		duration = duration + deltaTime;   //总共经过的时间
 		duration_i++;
 
-
 		//第一种生成敌人的尝试，每隔1000帧生成一个敌人
 		if(duration_i%100==1){
             newEnemy();
 		}
-
-
 		//Display Fps
 		nowFPS = 1.0 / deltaTime;
 		if(FPS_DISPLAY)

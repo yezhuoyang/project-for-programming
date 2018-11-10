@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-
+#include <sstream>
 
 #include "cleanup.h"
 #include "res_path.h"
@@ -152,7 +152,6 @@ SDL_Texture* renderText(const std::string &message, const std::string &fontFile,
 Image* textToImage( const std::string &msg,
 					const int32_t &size = fontSize, const Color &color = {255, 255, 255, 255},
 					const std::string &fontType = fontName);
-
 /*
  * Loads an image
  * @param file The image file to load
