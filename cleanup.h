@@ -7,7 +7,6 @@
  * Recurse through the list of arguments to clean up, cleaning up
  * the first one in the list each iteration.
 */
-
 template<typename T, typename... Args>
 void cleanup(T *t, Args&&... args){
 	//Cleanup the first item in the list
@@ -15,7 +14,6 @@ void cleanup(T *t, Args&&... args){
 	//Clean up the remaining arguments
 	cleanup(std::forward<Args>(args)...);
 }
-
 /*
  * These specializations serve to free the passed argument and also provide the
  * base cases for the recursive call above, eg. when args is only a single

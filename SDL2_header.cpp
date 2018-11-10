@@ -292,6 +292,7 @@ void drawText(const std::string &msg, const int &x, const int &y,
 	drawImage(image, x, y);
 	cleanup(image);
 }
+
 }
 
 int main(int argc, char* args[]) {
@@ -399,7 +400,6 @@ int main(int argc, char* args[]) {
 		}
 		duration = duration + deltaTime;   //总共经过的时间
 		duration_i++;
-
 		//第一种生成敌人的尝试，每隔1000帧生成一个敌人
 		if(duration_i%100==1){
             newEnemy();
