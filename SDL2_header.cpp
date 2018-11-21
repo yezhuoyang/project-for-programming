@@ -48,7 +48,6 @@ double nowFPS;
 double duration		= 0;
 uint64_t duration_i	= 0;
 Color canvasColor = {0, 0, 0, 255};
-
 bool mousePressed	= false;
 bool mouseDragged	= false;
 uint8_t mouseButton;
@@ -58,7 +57,6 @@ int pmouseX = -1;
 int pmouseY = -1;
 bool keyPressed = false;
 int keyValue;
-
 const unsigned int FPS_RATE = 60;
 const std::string RES_PATH_IMG	= getResourcePath("image");
 const std::string RES_PATH_FONT = getResourcePath("fonts");
@@ -82,7 +80,6 @@ void logSDLError(std::ostream &os, const std::string &msg){
  * @param ren The renderer to load the texture onto
  * @return the loaded texture, or nullptr if something went wrong.
  */
-
 SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren){
 	SDL_Texture *texture = IMG_LoadTexture(ren, file.c_str());
 	if (texture == nullptr){
@@ -90,7 +87,6 @@ SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren){
 	}
 	return texture;
 }
-
 /*
  * Draw an SDL_Texture to an SDL_Renderer at some destination rect
  * taking a clip of the texture if desired
@@ -100,7 +96,6 @@ SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren){
  * @param clip The sub-section of the texture to draw (clipping rect)
  *		default of nullptr draws the entire texture
  */
-
 void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, SDL_Rect dst,
 				   const double &angle, const SDL_Point *center,
 				   const SDL_RendererFlip &flip,
@@ -108,7 +103,6 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, SDL_Rect dst,
 {
 	SDL_RenderCopyEx(ren, tex, clip, &dst, angle, center, flip );
 }
-
 /*
  * Draw an SDL_Texture to an SDL_Renderer at position x, y, preserving
  * the texture's width and height and taking a clip of the texture if desired
@@ -120,7 +114,6 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, SDL_Rect dst,
  * @param clip The sub-section of the texture to draw (clipping rect)
  *		default of nullptr draws the entire texture
  */
-
 void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y,
 				   const double &widthRate,	const double &heightRate,
 				   const double &angle, const SDL_Point *center,
@@ -140,7 +133,6 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y,
 	}
 	renderTexture(tex, ren, dst, angle, center, flip, clip);
 }
-
 /*
  * Render the message we want to display to a texture for drawing
  * @param message The message we want to display
@@ -176,10 +168,7 @@ SDL_Texture* renderText(const std::string &message, const std::string &fontFile,
 	TTF_CloseFont(font);
 	return texture;
 }
-
 // ----------- Functions for users ---------------
-
-
 Image* textToImage( const std::string &msg,
 					const int32_t &size, const Color &color,
 					const std::string &fontType)
@@ -223,12 +212,10 @@ void setImageAlpha(Image *img,Uint8 alpha)
 	SDL_Renderer *ren = renderer;
 	renderTexture( img, ren, x, y, widthRate, heightRate,angle,center,flip,clip);
 }
-
 void getImageSize( Image *img, int &width, int &height )
 {
 	SDL_QueryTexture( img, NULL, NULL, &width, &height );
 }
-
 void setPenColor( const uint8_t &r, const uint8_t &g, const uint8_t &b, const uint8_t &a)
 {
 	lastColor[0] = r;
@@ -237,37 +224,30 @@ void setPenColor( const uint8_t &r, const uint8_t &g, const uint8_t &b, const ui
 	lastColor[3] = a;
 	SDL_SetRenderDrawColor( renderer, r, g, b, a );
 }
-
 void setPenColor( const Color &color )
 {
 	setPenColor( color.r, color.g, color.b, color.a );
 }
-
 void drawPoint( int x, int y )
 {
 	SDL_RenderDrawPoint( renderer, x, y );
 }
-
 void drawPoint( const Point& p )
 {
 	drawPoint( p.x, p.y );
 }
-
 void drawLine( int x1, int y1, int x2, int y2 )
 {
 	SDL_RenderDrawLine( renderer, x1, y1, x2, y2 );
 }
-
 void drawLine( const Point &p1 ,const Point &p2 )
 {
 	drawLine( p1.x, p1.y, p2.x, p2.y );
 }
-
 void drawLines(const SDL_Point* points, int count)
 {
 	SDL_RenderDrawLines( renderer, points, count );
 }
-
 void drawRect(const Rect& rect, const bool& fill)
 {
 	if( !fill )
@@ -275,12 +255,12 @@ void drawRect(const Rect& rect, const bool& fill)
 	else
 		SDL_RenderFillRect( renderer, &rect );
 }
-
 void setCanvas( int x, int y, int width, int height )
 {
 	SDL_Rect rect = {x,y,x+width,y+height};
 	SDL_RenderSetViewport( renderer, &rect );
 }
+
 // ---------------------------------------------------
 void drawText(const std::string &msg, const int &x, const int &y,
 			   const int32_t &size, const Color &color)
@@ -292,10 +272,9 @@ void drawText(const std::string &msg, const int &x, const int &y,
 	drawImage(image, x, y);
 	cleanup(image);
 }
-
 }
 
-int main(int argc, char* args[]) {
+int main(int argc, char* args[]){
 	using namespace Game;
 	//Start up SDL and make sure it went ok
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
@@ -335,6 +314,10 @@ int main(int argc, char* args[]) {
 	SDL_SetRenderDrawBlendMode( renderer, SDL_BLENDMODE_BLEND );
 	while(!quit)
 	{
+	    extern plane Player;
+	    if(Player.life<0){
+            break;
+	    }
 		while (SDL_PollEvent(&event))
 		{
 			switch (event.type)
@@ -352,7 +335,7 @@ int main(int argc, char* args[]) {
 					keyPressed = false;
 					keyUp();
 					break;
-				case SDL_MOUSEBUTTONDOWN :
+				case SDL_MOUSEBUTTONDOWN:
 					mouseButton = event.button.button;
 					pmouseX = mouseX;
 					pmouseY = mouseY;
@@ -362,7 +345,7 @@ int main(int argc, char* args[]) {
 					mouseDragged = false;
 					mousePress();
 					break;
-				case SDL_MOUSEMOTION :
+				case SDL_MOUSEMOTION:
 					pmouseX = mouseX;
 					pmouseY = mouseY;
 					mouseX = event.motion.x;
@@ -386,10 +369,9 @@ int main(int argc, char* args[]) {
 					break;
 			}
 		}
-		returnValue = work( quit );//先deal()，判断飞机是否移动，更新速度位置
+		returnValue = work(quit);//先deal()，判断飞机是否移动，更新速度位置
                                    //然后draw()，更新画面
                                    //最后看是否按Esc退出
-
 		t1 = SDL_GetTicks();//总时间，单位为毫秒
 		delta = t1 - t0;
 		t0 = t1;
@@ -398,7 +380,7 @@ int main(int argc, char* args[]) {
 			SDL_Delay(oneStepTime*1000 - delta);
 			deltaTime = oneStepTime;
 		}
-		duration = duration + deltaTime;   //总共经过的时间
+		duration = duration + deltaTime;//总共经过的时间
 		duration_i++;
 		//第一种生成敌人的尝试，每隔1000帧生成一个敌人
 		if(duration_i%100==1){
@@ -417,6 +399,78 @@ int main(int argc, char* args[]) {
 		SDL_RenderPresent(renderer);
 		setPenColor(lastColor[0],lastColor[1],lastColor[2],lastColor[3]);
 		SDL_RenderClear(renderer);
+}
+
+ while(!quit){
+   while (SDL_PollEvent(&event))
+		{
+			switch (event.type)
+			{
+				case SDL_QUIT :
+					quit = true;
+					break;
+				case SDL_KEYDOWN :
+					keyValue = event.key.keysym.sym;
+					keyPressed = true;
+					keyDown();
+					break;
+				case SDL_KEYUP:
+					keyValue = event.key.keysym.sym;
+					keyPressed = false;
+					keyUp();
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					mouseButton = event.button.button;
+					pmouseX = mouseX;
+					pmouseY = mouseY;
+					mouseX = event.button.x;
+					mouseY = event.button.y;
+					mousePressed = true;
+					mouseDragged = false;
+					mousePress();
+					break;
+				case SDL_MOUSEMOTION:
+					pmouseX = mouseX;
+					pmouseY = mouseY;
+					mouseX = event.motion.x;
+					mouseY = event.motion.y;
+					if (event.motion.state & SDL_BUTTON_LMASK || event.motion.state & SDL_BUTTON_RMASK)
+					{
+						mouseDragged = true;
+					}
+					mouseMove();
+					break;
+				case SDL_MOUSEBUTTONUP :
+					pmouseX = mouseX;
+					pmouseY = mouseY;
+					mouseX = event.button.x;
+					mouseY = event.button.y;
+					mousePressed = false;
+					mouseDragged = false;
+					mouseRelease();
+					break;
+				default:
+					break;
+			}
+		}
+        //returnValue = showresult();;//先deal()，判断飞机是否移动，更新速度位置
+                                   //然后draw()，更新画面
+                                   //最后看是否按Esc退出
+		t1 = SDL_GetTicks();//总时间，单位为毫秒
+		delta = t1 - t0;
+		t0 = t1;
+		deltaTime = delta / 1000.0;
+		if (delta < oneStepTime*1000) {
+			SDL_Delay(oneStepTime*1000 - delta);
+			deltaTime = oneStepTime;
+		}
+		duration = duration + deltaTime;//总共经过的时间
+		duration_i++;
+        showresult();
+        setPenColor(canvasColor);
+		setPenColor(lastColor[0],lastColor[1],lastColor[2],lastColor[3]);
+		SDL_RenderPresent(renderer);
+        SDL_RenderClear(renderer);
 }
 	finale();
 	cleanup( window, renderer);

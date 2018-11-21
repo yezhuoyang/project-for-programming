@@ -83,7 +83,6 @@ extern const std::string TitleName;
 
 extern std::string	fontName;
 extern int			fontSize;
-
 extern uint8_t lastColor[4];
 
 /*
@@ -142,7 +141,6 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y,
  * @param fontSize The size we want the font to be
  * @return An SDL_Texture containing the rendered message, or nullptr if something went wrong
  */
-
 SDL_Texture* renderText(const std::string &message, const std::string &fontFile, SDL_Color color,
 		int fontSize, SDL_Renderer *renderer);
 
@@ -152,14 +150,13 @@ SDL_Texture* renderText(const std::string &message, const std::string &fontFile,
 Image* textToImage( const std::string &msg,
 					const int32_t &size = fontSize, const Color &color = {255, 255, 255, 255},
 					const std::string &fontType = fontName);
+
 /*
  * Loads an image
  * @param file The image file to load
  * @return the loaded image, or nullptr if something went wrong.
  */
-
 Image* loadImage( const std::string &file );
-
 void setImageAlpha( Image *img, Uint8 alpha );
 
 /*
@@ -179,22 +176,15 @@ void drawImage(Image *img, int x, int y,
 			   const double &angle = 0, const Point *center = NULL,
 			   const FlipType &flip = FLIP_NONE,
 			   const Rect *clip = nullptr);
-
 void getImageSize( Image *img, int &width, int &height );
 void setPenColor( const uint8_t &r, const uint8_t &g, const uint8_t &b, const uint8_t &a);
 void setPenColor( const Color &color );
-
 void drawPoint( int x, int y );
 void drawPoint( const Point& p );
-
 void drawLine( int x1, int y1, int x2, int y2 );
 void drawLine( const Point &p1 ,const Point &p2 );
-
 void drawLines(const SDL_Point* points, int count);
-
 void drawRect( const Rect& rect, const bool& fill = false );
-
-
 void setCanvas( int x, int y, int width=SCREEN_WIDTH, int height=SCREEN_HEIGHT );
 
 // ---------------------------------------------------
@@ -215,7 +205,7 @@ extern void mouseRelease();
 extern void keyDown();
 extern void keyUp();
 extern void finale();
-
+extern void showresult();
 int main(int argc, char* args[]);
 
 

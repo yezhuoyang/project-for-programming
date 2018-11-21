@@ -4,17 +4,11 @@
 #include<ctime>
 #include <string>
 const std::string Game::TitleName = "Not A Simple Game Demo";
-const int Game::SCREEN_WIDTH	= 640;//宽度，x坐标
-const int Game::SCREEN_HEIGHT	= 480;//长度,y坐标
+const int Game::SCREEN_WIDTH	= 1000;//宽度，x坐标
+const int Game::SCREEN_HEIGHT	= 700;//长度,y坐标
 using namespace Game;
 std::map<int, bool> keyboard;
-object Player;
 PointD velocityPlayer;
-std::vector <object> Enemy={};
-std::vector <object> PlayerBullet={};
-std::vector <object> EnemyBullet={};//用于存放敌人子弹
-
-
 double velocityBullet;
 double velocityEnemyBullet;
 double speedPlayer;
@@ -24,28 +18,70 @@ double lifeofEnemy;//玩家的生命值
 double powerofPlayer;//玩家子弹的攻击力
 double powerofEnemy;//敌人子弹的攻击力
 double powerofCollide;//任意两个物体相撞的伤害值
+int SCORE;
 
 
-Image *imagePlayer, *imageBullet, *imageEnemy, *images[100],*imageEnemyBullet;
+Image *imageplane[10],*imagebullet[10],*imageflower[10];
+plane Player;
+std::vector <plane> Enemy={};
+std::vector <bullet> PlayerBullet={};
+std::vector <bullet> EnemyBullet={};//用于存放敌人子弹
+std::vector <flower> flowerlist={};//实现碰撞的火花效果
+
+
+
 
 void loadPictures()
 {
+    imageplane[0]=loadImage( "player.png" );
+    imagebullet[0]=loadImage( "bullet.png" );
+    imageflower[0]=loadImage("red_strip24.png");
+
+ /*
 	imagePlayer = loadImage( "player.png" );
 	imageBullet = loadImage( "bullet.png" );
 	imageEnemyBullet=loadImage("bullet.png");//敌人子弹图像
-	imageEnemy=loadImage( "enemy.png" );
+	imageEnemy=loadImage( "player.png" );
+	imagedie=loadImage( "player_u.png" );
+	//imageEnemy=loadImage( "enemy.png" );
+*/
 }
+
+
+void plotbullet(const bullet &A, int flip){
+     switch(flip){
+          case 0:
+               drawImage(imagebullet[A.type],A.pos.x, A.pos.y,1,1,A.speed.x*4,NULL,FLIP_NONE);
+          break;
+          break;
+          case 1:
+                 drawImage(imagebullet[A.type],A.pos.x, A.pos.y,1,1,-A.speed.x*4,NULL,FLIP_VERTICAL);
+     }
+}
+
+
+void plotplane(const plane &A, int flip){
+     switch(flip){
+          case 0:
+          drawImage(imageplane[A.type],A.pos.x, A.pos.y,1,1,A.speed.x*4,NULL,FLIP_NONE);
+          break;
+          break;
+          case 1:
+                 drawImage(imageplane[A.type],A.pos.x, A.pos.y,1,1,-A.speed.x*4,NULL,FLIP_VERTICAL);
+     }
+}
+
 
 void initialize()
 {
     lifeofPlayer=10;//玩家初始生命值
-	Player = object( SCREEN_WIDTH/2, SCREEN_HEIGHT/2,radiusPlayer,lifeofPlayer,0,0,0);
-	//Enemy[0] = Player
-	FPS_DISPLAY = true;;
+	Player.pos.x=SCREEN_WIDTH/2;Player.pos.y=SCREEN_HEIGHT/2;Player.radius=radiusPlayer;Player.life=lifeofPlayer;
+	Player.type=0;Player.bulletnum=3;
+	FPS_DISPLAY = true;
 	velocityBullet=-5;
 	velocityEnemyBullet=-10;
 	lifeofEnemy=100;//敌人初始生命值
-    Player.life=lifeofPlayer;
+    Player.life=lifeofPlayer*10000;
 	powerofPlayer=50;//玩家子弹的攻击力
 	powerofCollide=100;
 	powerofEnemy=1;//玩家子弹的攻击力
@@ -58,17 +94,46 @@ void initialize()
 
 void drawPlayer()
 {
-	int w,h;
-	getImageSize( imagePlayer, w, h );
-	setImageAlpha( imagePlayer, 150);
-	drawImage( imagePlayer, Player.pos.x-w/2, Player.pos.y-h/2, 0.5, 0.5 );
+   plotplane(Player,0);
 }
+
+
+void Enemyshoot(){
+    for(std::vector<plane>::iterator iter=Enemy.begin();iter!=Enemy.end();++iter)
+	{
+       if((*iter).period%81==1){
+            int k=-((*iter).bulletnum-1)/2;
+            for(int i=0;i<(*iter).bulletnum;++i){
+               bullet tmp(0,(*iter).pos.x,(*iter).pos.y,0,1,0,3*k,velocityEnemyBullet);
+               EnemyBullet.push_back(tmp);
+               k++;
+            }
+       }
+	}
+}
+
+
+
+void Playershoot(){
+            int k=-(Player.bulletnum-1)/2;
+            for(int i=0;i<Player.bulletnum;++i){
+               bullet tmp(0,Player.pos.x-25,Player.pos.y-50,0,1,0,3*k,velocityBullet);
+               PlayerBullet.push_back(tmp);
+               k++;
+            }
+}
+
 
 //判断是否发生碰撞
-
-bool collide(object A,object B){
-    return (B.pos-A.pos).length()<=(A.radius+B.radius);
+template <typename T1,typename T2>
+bool collide(T1 A,T2 B){
+    return (A.pos-B.pos).length()<=(A.radius+B.radius);
 }
+
+
+
+
+
 
 //以下两个函数用于画游戏开始与结束
 void drawBackground()
@@ -98,40 +163,34 @@ void drawHint()
 }
 
 //显示玩家当前状态
-
 void drawStatus(){
-       std::stringstream ss;
-       std::string status;
-       ss<<Player.life;
-       ss>>status;
-       Image *text=textToImage(status);
-       int w,h;
-       getImageSize(text,w,h);
-	   drawImage(text,0,SCREEN_HEIGHT/2,1,1,0);
-	   cleanup(text);
+        char info[20];
+        extern plane Player;
+        sprintf(info, "LIFE: %2d", (int)(Player.life));
+        drawText( info, 200,430);
 }
 
 void drawBullet()
 {
-   for(std::vector<object>::iterator iter=PlayerBullet.begin();iter!=PlayerBullet.end();++iter)
+    for(std::vector<bullet>::iterator iter=PlayerBullet.begin();iter!=PlayerBullet.end();++iter)
+	  plotbullet((*iter),0);
+   for(std::vector<bullet>::iterator iter=EnemyBullet.begin();iter!=EnemyBullet.end();++iter)
+	  plotbullet((*iter),1);
+ /*
+   for(std::vector<bullet>::iterator iter=PlayerBullet.begin();iter!=PlayerBullet.end();++iter)
 	  drawImage(imageBullet, (*iter).pos.x, (*iter).pos.y, 0.5, 0.5 );
-   for(std::vector<object>::iterator iter=EnemyBullet.begin();iter!=EnemyBullet.end();++iter)
+   for(std::vector<bullet>::iterator iter=EnemyBullet.begin();iter!=EnemyBullet.end();++iter)
 	  drawImage(imageEnemyBullet, (*iter).pos.x, (*iter).pos.y, 0.5, 0.5 );
+*/
 }
 
 int lastAnime = 0;
 void drawEnemy()
 {
    int w=10,h=10;
-   for(std::vector<object>::iterator iter=Enemy.begin();iter!=Enemy.end();++iter){
-          getImageSize(imageEnemy,w,h );
-	      lastAnime = (lastAnime+15)%(4*60);
-          Rect clip = {w/16*(lastAnime/60), 0, w/16,h/16};
-	      setImageAlpha( imageEnemy, 255 );
-          drawImage( imageEnemy, (*iter).pos.x, (*iter).pos.y, 2, 2, 0, NULL, FLIP_NONE, &clip );
-	      //drawImage(imageEnemy, (*iter).pos.x,(*iter).pos.y, 0.5,0.5);
+   for(std::vector<plane>::iterator iter=Enemy.begin();iter!=Enemy.end();++iter){
+            plotplane(*iter,1);
 }
-
 /*
 	int w,h;
 	getImageSize( imageEnemy, w, h );
@@ -141,32 +200,31 @@ void drawEnemy()
 	drawImage( imageEnemy, Enemy[0].x, Enemy[0].y, 2, 2, 0, NULL, FLIP_NONE, &clip );
 */
 }
+
+
+
+void drawflower(){
+    for(std::vector<flower>::iterator iter=flowerlist.begin();iter!=flowerlist.end();++iter){
+            int w,h;
+            getImageSize(imageflower[(*iter).type], w, h );
+            Rect clip = {w/24*(*iter).life,0, w/24,h};
+            drawImage(imageflower[(*iter).type],(*iter).pos.x, (*iter).pos.y, 1, 1,0, NULL, FLIP_NONE, &clip );
+            (*iter).life++;
+    }
+}
+
+
 //此函数用于生成敌人
-
-
 void  newEnemy(){
     if(Enemy.size()<4){
-        object tmp((rand()%640),10,lifeofEnemy,radiusEnemy,0,0,1);
+        plane tmp(0,(rand()%640),10,lifeofEnemy,radiusEnemy,0,0,1);
         Enemy.push_back(tmp);
     }
 }
 
-
 //速度更新,随机移动
 void moveEnemy(){
-/*
-for(std::vector<object>::iterator iter1=Enemy.begin();iter1!=Enemy.end();++iter1)
-{
-    for(std::vector<object>::iterator iter2=iter1;iter2!=Enemy.end();++iter2)
-    {
-        if(collide(*iter1,*iter2)){
-                 (*iter1).speed.x=0;
-                 (*iter1).speed.y=0;
-         }
-    }
-}
-*/
-for(std::vector<object>::iterator iter=Enemy.begin();iter!=Enemy.end();)
+for(std::vector<plane>::iterator iter=Enemy.begin();iter!=Enemy.end();)
 {
      if((*iter).pos.x+(*iter).speed.x<0||((*iter).pos.x+(*iter).speed.x>SCREEN_WIDTH-30)){
           (*iter).speed.x=0;
@@ -180,7 +238,7 @@ for(std::vector<object>::iterator iter=Enemy.begin();iter!=Enemy.end();)
 }
 
 int judge;
- for(std::vector<object>::iterator iter=Enemy.begin();iter!=Enemy.end();++iter)
+ for(std::vector<plane>::iterator iter=Enemy.begin();iter!=Enemy.end();++iter)
 {
     if((*iter).period%30==0){
             judge=rand()%3;
@@ -194,38 +252,33 @@ int judge;
             }
     }
 }
-
-
-
 }
 
 
 void draw()
 {
 	//drawBackground();
-	drawPlayer();
+
 	drawBullet();
 	drawEnemy();
+	drawPlayer();
+	drawflower();
 	//drawForeground();
 	drawHint();
 	drawStatus();//显示用户生命值，其他状态的函数
 }
 
+
 void deal()
 {
     Player.period++;//用period表示对象存活的时间
-
-
-    for(std::vector<object>::iterator iter=Enemy.begin();iter!=Enemy.end();++iter)
+    std::cout<<(Player).pos.x<<" "<<(Player).pos.y<<std::endl;
+    for(std::vector<plane>::iterator iter=Enemy.begin();iter!=Enemy.end();++iter)
 	{
          (*iter).period++;
-         std::cout<<(*iter).period<<" ";
 	}
-    std::cout<<std::endl;
     bool shoot=false;
 	bool move = false;
-	object tmp;//用来给新生成的节点结构体赋初值
-
 	if(keyboard['k']&&Player.period%5==1)
     {
         shoot=true;
@@ -245,7 +298,6 @@ void deal()
 		Player.speed=Player.speed+PointD(-1,0)*speedPlayer;
 		move = true;
 	}
-
 	if( keyboard[KEY_RIGHT] || keyboard['d'] )
 	{
 		Player.speed=Player.speed+PointD(+1,0)*speedPlayer;
@@ -256,22 +308,18 @@ void deal()
 	{
 		Player.speed = Player.speed/len*speedPlayer;
 	}
-
-
-
-    moveEnemy();
-
 //以下用于更新玩家的子弹
-for(std::vector<object>::iterator iter=PlayerBullet.begin();iter!=PlayerBullet.end();)
+for(std::vector<bullet>::iterator iter=PlayerBullet.begin();iter!=PlayerBullet.end();)
 {
         (*iter).pos=(*iter).pos+(*iter).speed;
-        for(std::vector<object>::iterator iter2=Enemy.begin();iter2!=Enemy.end();++iter2)
+        for(std::vector<plane>::iterator iter2=Enemy.begin();iter2!=Enemy.end();++iter2)
         {
             if(collide((*iter),(*iter2)))
             {
                 //如果碰撞，则将子弹去除，待加碰撞效果
                 (*iter).life-=powerofCollide;
                 (*iter2).life-=powerofPlayer;
+                (*iter2).speed.y-=0.5;
                 //std::cout<<"Shoot!"<<std::endl;
             }
         }
@@ -285,8 +333,7 @@ for(std::vector<object>::iterator iter=PlayerBullet.begin();iter!=PlayerBullet.e
                 }
 }
 
-
-for(std::vector<object>::iterator iter=EnemyBullet.begin();iter!=EnemyBullet.end();)
+for(std::vector<bullet>::iterator iter=EnemyBullet.begin();iter!=EnemyBullet.end();)
 	{
            (*iter).pos=(*iter).pos-(*iter).speed;
             if(collide((*iter),Player))
@@ -298,6 +345,8 @@ for(std::vector<object>::iterator iter=EnemyBullet.begin();iter!=EnemyBullet.end
             }
 
             if((*iter).pos.y>480||(*iter).life<0){
+                    flower tmp(0,(*iter).pos.x,(*iter).pos.y,23,1);
+                    flowerlist.push_back(tmp);
                     EnemyBullet.erase(iter);
                     //std::cout<<"YEnemybullet out!"<<std::endl;
                 }
@@ -306,7 +355,7 @@ for(std::vector<object>::iterator iter=EnemyBullet.begin();iter!=EnemyBullet.end
                 }
 }
 	//除去被击毁的敌机，判断敌机是否与玩家碰撞
-    for(std::vector<object>::iterator iter=Enemy.begin();iter!=Enemy.end();)
+for(std::vector<plane>::iterator iter=Enemy.begin();iter!=Enemy.end();)
     {
         if(collide((*iter),Player))
             {
@@ -317,29 +366,34 @@ for(std::vector<object>::iterator iter=EnemyBullet.begin();iter!=EnemyBullet.end
             }
 
         if((*iter).life<0){
-            Enemy.erase(iter);
+            (*iter).type=3;
+            ++iter;
+            //Enemy.erase(iter);
+            ++SCORE;
         }
         else{
              iter++;
         }
     }
-
+  std::cout<<flowerlist.size()<<std::endl;
+  for(std::vector<flower>::iterator iter=flowerlist.begin();iter!=flowerlist.end();)
+    {
+         if((*iter).life>=(*iter).maxtime){
+              flowerlist.erase(iter);
+         }
+         else{
+            ++iter;
+         }
+    }
     //如果按了射击键，则生成一个新的子弹
 	if(shoot){
-       tmp=object(Player.pos.x-25,Player.pos.y-50,0,1,0,0,velocityBullet);
-       PlayerBullet.push_back(tmp);
-	}
-
+         	Playershoot();
+	         }
+	moveEnemy();
 	//敌机发射子弹
-    for(std::vector<object>::iterator iter=Enemy.begin();iter!=Enemy.end();++iter)
-	{
-       if((*iter).period%81==1){
-               tmp=object((*iter).pos.x,(*iter).pos.y,0,1,0,0,velocityEnemyBullet);
-               EnemyBullet.push_back(tmp);
-       }
-	}
+    Enemyshoot();
 
-    //判断玩家是否触游戏边界
+
     if(Player.pos.x+ Player.speed.x<0||Player.pos.y+Player.speed.y<0||Player.pos.y+Player.speed.y>SCREEN_HEIGHT||
        Player.pos.x+ Player.speed.x>SCREEN_WIDTH){
         Player.speed=Player.speed*0;
@@ -354,6 +408,7 @@ for(std::vector<object>::iterator iter=EnemyBullet.begin();iter!=EnemyBullet.end
 		if( Player.speed.length() < 0.1 )
 			Player.speed= PointD();
 	}
+
 	//Enemy[0] = PointD(mouseX,mouseY);
 }
 
@@ -393,9 +448,21 @@ void keyUp()
 
 void finale()
 {
-	cleanup( imagePlayer, imageBullet, imageEnemy);
-	for( int i = 0; i < 100; ++i )
-		cleanup( images[i] );
+    for(int i=0;i<10;++i){
+        cleanup( imageplane[i]);
+        cleanup( imagebullet[i]);
+        cleanup( imageflower[i]);
+    }
 }
+
+void showresult()
+{
+     SDL_RenderClear(renderer);
+     char info[20];
+     sprintf(info, "YOUR SCORE: %2d", (int)(SCORE));
+     drawText(info,200,430);
+}
+
+
 
 
