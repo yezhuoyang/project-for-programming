@@ -10,7 +10,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
-
 #include <iostream>
 #include <cstdio>
 #include <cmath>
@@ -18,24 +17,22 @@
 #include <string>
 #include <vector>
 #include <sstream>
-
 #include "cleanup.h"
 #include "res_path.h"
 #include "pointd.h"
+#include <SDL2/SDL_mixer.h>
+
 
 namespace Game {
-
-
 #define Image		SDL_Texture
+#define Audio       Mix_Music
 #define Color		SDL_Color
 #define Rect		SDL_Rect
 #define Point		SDL_Point
 #define FlipType	SDL_RendererFlip
-
 #define FLIP_NONE		SDL_FLIP_NONE			/**< Do not flip */
 #define FLIP_HORIZONTAL SDL_FLIP_HORIZONTAL		/**< flip horizontally */
 #define FLIP_VERTICAL	SDL_FLIP_VERTICAL		/**< flip vertically */
-
 #define KEY_SPACE	SDLK_SPACE
 #define KEY_ENTER	SDLK_RETURN
 #define KEY_RETURN	SDLK_RETURN
@@ -51,11 +48,10 @@ namespace Game {
 #define KEY_RCTRL	SDLK_RCTRL
 #define KEY_RALT	SDLK_RSHIFT
 #define KEY_RSHIFT	SDLK_RALT
-
-
 #define MOUSE_LEFT   SDL_BUTTON_LEFT
 #define MOUSE_MIDDLE SDL_BUTTON_MIDDLE
 #define MOUSE_RIGHT  SDL_BUTTON_RIGHT
+
 
 extern SDL_Renderer	*renderer;
 extern SDL_Window	*window;
@@ -71,7 +67,6 @@ extern int mouseX;
 extern int mouseY;
 extern bool keyPressed;
 extern int keyValue;
-
 extern const unsigned int FPS_RATE;
 extern const std::string RES_PATH_IMG;
 extern const std::string RES_PATH_FONT;
@@ -198,7 +193,8 @@ void drawText( const std::string &msg, const int &x, const int &y,
 // Functions for programming
 extern void initialize();
 extern void newEnemy();
-extern int	work( bool & );
+extern int	work( bool &);
+extern int  choice();
 extern void mousePress();
 extern void mouseMove();
 extern void mouseRelease();

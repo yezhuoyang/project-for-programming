@@ -12,7 +12,6 @@
  * res/
  *  Lesson1/
  *  Lesson2/
- *
  * Paths returned will be Project_Root/res/subDir
  */
 

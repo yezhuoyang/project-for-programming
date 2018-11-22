@@ -38,6 +38,7 @@
 		</Compiler>
 		<Linker>
 			<Add option="-lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_image" />
+			<Add option="-lSDL2_mixer" />
 			<Add directory="SDL2plus-windows/lib" />
 		</Linker>
 		<Unit filename="SDL2_header.cpp" />

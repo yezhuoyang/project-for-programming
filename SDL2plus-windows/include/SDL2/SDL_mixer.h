@@ -21,7 +21,6 @@
 
 #ifndef SDL_MIXER_H_
 #define SDL_MIXER_H_
-
 #include "SDL_stdinc.h"
 #include "SDL_rwops.h"
 #include "SDL_audio.h"
@@ -33,7 +32,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 /* Printable format: "%d.%d.%d", MAJOR, MINOR, PATCHLEVEL
 */
 #define SDL_MIXER_MAJOR_VERSION 2
@@ -49,13 +47,11 @@ extern "C" {
     (X)->minor = SDL_MIXER_MINOR_VERSION;           \
     (X)->patch = SDL_MIXER_PATCHLEVEL;              \
 }
-
 /* Backwards compatibility */
 #define MIX_MAJOR_VERSION   SDL_MIXER_MAJOR_VERSION
 #define MIX_MINOR_VERSION   SDL_MIXER_MINOR_VERSION
 #define MIX_PATCHLEVEL      SDL_MIXER_PATCHLEVEL
 #define MIX_VERSION(X)      SDL_MIXER_VERSION(X)
-
 /**
  *  This is the version number macro for the current SDL_mixer version.
  */
@@ -73,7 +69,6 @@ extern "C" {
    use the SDL_MIXER_VERSION() macro.
  */
 extern DECLSPEC const SDL_version * SDLCALL Mix_Linked_Version(void);
-
 typedef enum
 {
     MIX_INIT_FLAC   = 0x00000001,
@@ -87,8 +82,9 @@ typedef enum
    one or more flags from MIX_InitFlags OR'd together.
    It returns the flags successfully initialized, or 0 on failure.
  */
-extern DECLSPEC int SDLCALL Mix_Init(int flags);
 
+
+extern DECLSPEC int SDLCALL Mix_Init(int flags);
 /* Unloads libraries loaded with Mix_Init */
 extern DECLSPEC void SDLCALL Mix_Quit(void);
 
@@ -162,7 +158,6 @@ extern DECLSPEC int SDLCALL Mix_QuerySpec(int *frequency,Uint16 *format,int *cha
 extern DECLSPEC Mix_Chunk * SDLCALL Mix_LoadWAV_RW(SDL_RWops *src, int freesrc);
 #define Mix_LoadWAV(file)   Mix_LoadWAV_RW(SDL_RWFromFile(file, "rb"), 1)
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS(const char *file);
-
 /* Load a music file from an SDL_RWop object (Ogg and MikMod specific currently)
    Matt Campbell (matt@campbellhome.dhs.org) April 2000 */
 extern DECLSPEC Mix_Music * SDLCALL Mix_LoadMUS_RW(SDL_RWops *src, int freesrc);
@@ -323,8 +318,6 @@ typedef void (SDLCALL *Mix_EffectDone_t)(int chan, void *udata);
  *  Error messages can be retrieved from Mix_GetError().
  */
 extern DECLSPEC int SDLCALL Mix_RegisterEffect(int chan, Mix_EffectFunc_t f, Mix_EffectDone_t d, void *arg);
-
-
 /* You may not need to call this explicitly, unless you need to stop an
  *  effect from processing in the middle of a chunk's playback.
  * Posteffects are never implicitly unregistered as they are for channels,
@@ -334,8 +327,6 @@ extern DECLSPEC int SDLCALL Mix_RegisterEffect(int chan, Mix_EffectFunc_t f, Mix
  *  Error messages can be retrieved from Mix_GetError().
  */
 extern DECLSPEC int SDLCALL Mix_UnregisterEffect(int channel, Mix_EffectFunc_t f);
-
-
 /* You may not need to call this explicitly, unless you need to stop all
  *  effects from processing in the middle of a chunk's playback. Note that
  *  this will also shut off some internal effect processing, since
@@ -348,8 +339,6 @@ extern DECLSPEC int SDLCALL Mix_UnregisterEffect(int channel, Mix_EffectFunc_t f
  *  Error messages can be retrieved from Mix_GetError().
  */
 extern DECLSPEC int SDLCALL Mix_UnregisterAllEffects(int channel);
-
-
 #define MIX_EFFECTSMAXSPEED  "MIX_EFFECTSMAXSPEED"
 
 /*
@@ -360,8 +349,6 @@ extern DECLSPEC int SDLCALL Mix_UnregisterAllEffects(int channel);
  *  MIX_EFFECTSMAXSPEED (see above) is defined before you call
  *  Mix_OpenAudio().
  */
-
-
 /* Set the panning of a channel. The left and right channels are specified
  *  as integers between 0 and 255, quietest to loudest, respectively.
  *
@@ -388,8 +375,6 @@ extern DECLSPEC int SDLCALL Mix_UnregisterAllEffects(int channel);
  *  Error messages can be retrieved from Mix_GetError().
  */
 extern DECLSPEC int SDLCALL Mix_SetPanning(int channel, Uint8 left, Uint8 right);
-
-
 /* Set the position of a channel. (angle) is an integer from 0 to 360, that
  *  specifies the location of the sound in relation to the listener. (angle)
  *  will be reduced as neccesary (540 becomes 180 degrees, -100 becomes 260).
@@ -483,7 +468,6 @@ extern DECLSPEC int SDLCALL Mix_SetDistance(int channel, Uint8 distance);
  */
 extern no_parse_DECLSPEC int SDLCALL Mix_SetReverb(int channel, Uint8 echo);
 #endif
-
 /* Causes a channel to reverse its stereo. This is handy if the user has his
  *  speakers hooked up backwards, or you would like to have a minor bit of
  *  psychedelia in your sound code.  :)  Calling this function with (flip)

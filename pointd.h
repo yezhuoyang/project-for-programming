@@ -6,6 +6,7 @@
 #define POINTD_HPP
 #include <cmath>
 #define Image  SDL_Texture
+
 struct PointD
 {
 	PointD(const double &X=0, const double &Y=0)
@@ -50,13 +51,20 @@ struct bullet
     PointD speed;
     double theta;
     double radius;
+    int powerofcollide;
     int  type;//加载图像类别
     Image *picture;//指向加载图像的指针；
-    double life;//存储生命值
+    int width;
+    int height;
+    int life;//存储生命值
+    int shotperiod;//记录撞击效果的时间
 	int period;//存储在游戏中已存活的时间
-    bullet(const int &t,const double &X=0,const double &Y=0,const double &R=0,const double &Life=0,const double &P=0,
+    bullet(const int &t,const int &wid,const int &hei,const int &Pow,const double &X=0,const double &Y=0,const int &Life=0,const double &P=0,
            const double &Vx=0,const double &Vy=0,const double &th=0)
-           :type(t),pos(PointD(X,Y)),radius(R),life(Life),period(P),speed(PointD(Vx,Vy)),theta(th){}
+           :type(t),width(wid),height(hei),powerofcollide(Pow),pos(PointD(X,Y)),life(Life),period(P),speed(PointD(Vx,Vy)),theta(th)
+           {
+                radius=std::min(width*1.0/2,height*1.0/2);
+           }
     bullet(){};
 };
 
@@ -67,14 +75,49 @@ struct plane
     double theta;
     double radius;
     int bulletnum;
+    int powerofcollide;
+    int width;
+    int height;
     int  type;//加载图像类别
-    double life;//存储生命值
+    int life;//存储生命值
+    int shotperiod;//记录撞击效果的时间
 	int period;//存储在游戏中已存活的时间
-    plane(const int &t,const double &X=0,const double &Y=0,const double &R=0,const double &Life=0,const double &P=0,
+    plane(const int &t,const int &wid,const int &hei,const int &Pow=100,const double &X=0,const double &Y=0,const int &Life=0,const double &P=0,
            const double &Vx=0,const double &Vy=0,const double &th=0,const int &n=1)
-           :type(t),pos(PointD(X,Y)),radius(R),life(Life),period(P),speed(PointD(Vx,Vy)),theta(th),bulletnum(n){}
+           :type(t),width(wid),height(hei),powerofcollide(Pow),pos(PointD(X,Y)),life(Life),period(P),speed(PointD(Vx,Vy)),theta(th),bulletnum(n)
+           {
+              radius=std::min(width*1.0/2,height*1.0/2);shotperiod=0;
+           }
     plane(){};
 };
+
+
+
+struct playerplane
+{
+    PointD pos;
+    PointD speed;
+    double theta;
+    double radius;
+    int bulletnum;
+    int powerofcollide;
+    int width;
+    int height;
+    int  type;//加载图像类别
+    int properiod;
+    int shotperiod;//记录撞击效果的时间
+    int life;//存储生命值
+	int period;//存储在游戏中已存活的时间
+    playerplane(const int &t,const int &wid,const int &hei,const int &Pow=100,const double &X=0,const double &Y=0,const int &Life=0,const double &P=0,
+           const double &Vx=0,const double &Vy=0,const double &th=0,const int &n=1)
+           :type(t),width(wid),height(hei),powerofcollide(Pow),pos(PointD(X,Y)),life(Life),period(P),speed(PointD(Vx,Vy)),theta(th),bulletnum(n)
+           {
+              radius=std::min(width*1.0/2,height*1.0/2);shotperiod=0;
+              int properiod;
+           }
+    playerplane(){};
+};
+
 
 
 //碰撞效果对象
@@ -84,10 +127,24 @@ struct flower
     int  type;//加载图像类别
     int maxtime;//最大存活时间
     int life;//已经存在的时间
-	int period;//存储在游戏中已存活的时间
-    flower(const int &t,const double &X=0,const double &Y=0,const int maxt=23,const double &Life=1)
-           :type(t),pos(PointD(X,Y)),maxtime(maxt),life(Life){}
+    int width;
+    int height;
+    flower(const int &t,const int &wid,const int &hei,const double &X=0,const double &Y=0,const int maxt=23)
+           :type(t),width(wid),height(hei),pos(PointD(X,Y)),maxtime(maxt){life=1;}
     flower(){};
+};
+
+struct object
+{
+    PointD pos;
+    int  type;//加载图像类别 1加生命，2加攻击
+    int maxtime;//最大存活时间
+    int life;//已经存在的时间
+    int width;
+    int height;
+    object(const int &t,const int &wid,const int &hei,const double &X=0,const double &Y=0,const int maxt=23)
+           :type(t),width(wid),height(hei),pos(PointD(X,Y)),maxtime(maxt){life=1;}
+    object(){};
 };
 
 

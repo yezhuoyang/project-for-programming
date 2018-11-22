@@ -4,7 +4,6 @@
 
 // -------------res_path.h------------
 std::string getResourcePath(const std::string &subDir){
-
 #ifdef _WIN32
 	const char PATH_SEP = '\\';
 #else
@@ -28,6 +27,7 @@ std::string getResourcePath(const std::string &subDir){
 	return subDir.empty() ? baseRes : baseRes + subDir + PATH_SEP;
 }
 
+
 // -------------pointd.h--------------
 double cross( const PointD &a, const PointD &b )
 {
@@ -38,14 +38,12 @@ double dot( const PointD &a, const PointD &b )
 	return a.x*b.x + a.y*b.y;
 }
 // -----------SDL2_header.h------------
-
-
 namespace Game {
 SDL_Renderer	*renderer	= NULL;
 SDL_Window		*window		= NULL;
 bool FPS_DISPLAY	= false;
 double nowFPS;
-double duration		= 0;
+double duration= 0;
 uint64_t duration_i	= 0;
 Color canvasColor = {0, 0, 0, 255};
 bool mousePressed	= false;
@@ -133,6 +131,7 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y,
 	}
 	renderTexture(tex, ren, dst, angle, center, flip, clip);
 }
+
 /*
  * Render the message we want to display to a texture for drawing
  * @param message The message we want to display
@@ -212,6 +211,7 @@ void setImageAlpha(Image *img,Uint8 alpha)
 	SDL_Renderer *ren = renderer;
 	renderTexture( img, ren, x, y, widthRate, heightRate,angle,center,flip,clip);
 }
+
 void getImageSize( Image *img, int &width, int &height )
 {
 	SDL_QueryTexture( img, NULL, NULL, &width, &height );
@@ -312,6 +312,70 @@ int main(int argc, char* args[]){
 	bool quit = false;
 	t0 = SDL_GetTicks();
 	SDL_SetRenderDrawBlendMode( renderer, SDL_BLENDMODE_BLEND );
+
+//打开游戏，进行选择
+ while(!quit){
+   while (SDL_PollEvent(&event))
+		{
+			switch (event.type)
+			{
+				case SDL_QUIT :
+					quit = true;
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					mouseButton = event.button.button;
+					pmouseX = mouseX;
+					pmouseY = mouseY;
+					mouseX = event.button.x;
+					mouseY = event.button.y;
+					mousePressed = true;
+					mouseDragged = false;
+					mousePress();
+					break;
+				case SDL_MOUSEMOTION:
+					pmouseX = mouseX;
+					pmouseY = mouseY;
+					mouseX = event.motion.x;
+					mouseY = event.motion.y;
+					if (event.motion.state & SDL_BUTTON_LMASK || event.motion.state & SDL_BUTTON_RMASK)
+					{
+						mouseDragged = true;
+					}
+					mouseMove();
+					break;
+				case SDL_MOUSEBUTTONUP :
+					pmouseX = mouseX;
+					pmouseY = mouseY;
+					mouseX = event.button.x;
+					mouseY = event.button.y;
+					mousePressed = false;
+					mouseDragged = false;
+					mouseRelease();
+					break;
+				default:
+					break;
+			}
+		}
+
+        if(choice()){
+           break;
+        }
+
+		t1 = SDL_GetTicks();//总时间，单位为毫秒
+		delta = t1 - t0;
+		t0 = t1;
+		deltaTime = delta / 1000.0;
+		if (delta < oneStepTime*1000) {
+			SDL_Delay(oneStepTime*1000 - delta);
+			deltaTime = oneStepTime;
+		}
+        setPenColor(canvasColor);
+		setPenColor(lastColor[0],lastColor[1],lastColor[2],lastColor[3]);
+		SDL_RenderPresent(renderer);
+        SDL_RenderClear(renderer);
+}
+
+//进行游戏
 	while(!quit)
 	{
 	    extern plane Player;
@@ -401,6 +465,7 @@ int main(int argc, char* args[]){
 		SDL_RenderClear(renderer);
 }
 
+//结束游戏，现实结果
  while(!quit){
    while (SDL_PollEvent(&event))
 		{
