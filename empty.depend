@@ -383,7 +383,7 @@
 	"pointd.h"
 	"SDL2_header.h"
 
-1542893929 source:d:\empty\project-for-programming\sdl2_header.cpp
+1542975256 source:d:\empty\project-for-programming\sdl2_header.cpp
 	"res_path.h"
 	"pointd.h"
 	"SDL2_header.h"
@@ -726,10 +726,10 @@
 	"begin_code.h"
 	"close_code.h"
 
-1542904516 d:\empty\project-for-programming\pointd.h
+1542984961 d:\empty\project-for-programming\pointd.h
 	<cmath>
 
-1542892641 d:\empty\project-for-programming\sdl2_header.h
+1542939199 d:\empty\project-for-programming\sdl2_header.h
 	<SDL2/SDL.h>
 	<SDL2/SDL_ttf.h>
 	<SDL2/SDL_image.h>
@@ -760,7 +760,7 @@
 	<utility>
 	<SDL2/SDL.h>
 
-1542899011 source:d:\empty\project-for-programming\main2.cpp
+1542985716 source:d:\empty\project-for-programming\main2.cpp
 	"SDL2_header.h"
 	<SDL2/SDL_mixer.h>
 	<cstdio>
@@ -768,7 +768,7 @@
 	<ctime>
 	<string>
 
-1508772768 d:\empty\project-for-programming\sdl2plus-windows\include\sdl2\sdl_mixer.h
+1542944983 d:\empty\project-for-programming\sdl2plus-windows\include\sdl2\sdl_mixer.h
 	"SDL_stdinc.h"
 	"SDL_rwops.h"
 	"SDL_audio.h"

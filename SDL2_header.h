@@ -4,7 +4,6 @@
  * Part of this code came from https://github.com/Twinklebear/TwinklebearDev-Lessons
  *
  */
-
 #ifndef SDL2_HEADER_H
 #define SDL2_HEADER_H
 #include <SDL2/SDL.h>
@@ -70,7 +69,7 @@ extern int keyValue;
 extern const unsigned int FPS_RATE;
 extern const std::string RES_PATH_IMG;
 extern const std::string RES_PATH_FONT;
-
+extern const std::string RES_PATH_MUSIC;
 //Screen attributes
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;

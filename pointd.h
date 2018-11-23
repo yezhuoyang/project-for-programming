@@ -44,13 +44,13 @@ struct PointD
 	}
 };
 
-
 struct bullet
 {
     PointD pos;
     PointD speed;
     double theta;
     double radius;
+    int mass;
     int powerofcollide;
     int  type;//加载图像类别
     Image *picture;//指向加载图像的指针；
@@ -59,9 +59,9 @@ struct bullet
     int life;//存储生命值
     int shotperiod;//记录撞击效果的时间
 	int period;//存储在游戏中已存活的时间
-    bullet(const int &t,const int &wid,const int &hei,const int &Pow,const double &X=0,const double &Y=0,const int &Life=0,const double &P=0,
-           const double &Vx=0,const double &Vy=0,const double &th=0)
-           :type(t),width(wid),height(hei),powerofcollide(Pow),pos(PointD(X,Y)),life(Life),period(P),speed(PointD(Vx,Vy)),theta(th)
+    bullet(const int &t,const int &wid,const int &hei,const int &Pow,const double &X=0,const double &Y=0,const int &Life=0,const int &P=0,
+           const double &Vx=0,const double &Vy=0,const double &th=0,const int &M=1)
+           :type(t),width(wid),height(hei),powerofcollide(Pow),pos(PointD(X,Y)),life(Life),period(P),speed(PointD(Vx,Vy)),theta(th),mass(M)
            {
                 radius=std::min(width*1.0/2,height*1.0/2);
            }
@@ -82,7 +82,7 @@ struct plane
     int life;//存储生命值
     int shotperiod;//记录撞击效果的时间
 	int period;//存储在游戏中已存活的时间
-    plane(const int &t,const int &wid,const int &hei,const int &Pow=100,const double &X=0,const double &Y=0,const int &Life=0,const double &P=0,
+    plane(const int &t,const int &wid,const int &hei,const int &Pow=100,const double &X=0,const double &Y=0,const int &Life=0,const int &P=0,
            const double &Vx=0,const double &Vy=0,const double &th=0,const int &n=1)
            :type(t),width(wid),height(hei),powerofcollide(Pow),pos(PointD(X,Y)),life(Life),period(P),speed(PointD(Vx,Vy)),theta(th),bulletnum(n)
            {
@@ -90,6 +90,7 @@ struct plane
            }
     plane(){};
 };
+
 
 
 
@@ -106,19 +107,19 @@ struct playerplane
     int  type;//加载图像类别
     int properiod;
     int shotperiod;//记录撞击效果的时间
+    int thunder;//大招时间记时
     int life;//存储生命值
 	int period;//存储在游戏中已存活的时间
-    playerplane(const int &t,const int &wid,const int &hei,const int &Pow=100,const double &X=0,const double &Y=0,const int &Life=0,const double &P=0,
+    playerplane(const int &t,const int &wid,const int &hei,const int &Pow=100,const double &X=0,const double &Y=0,const int &Life=0,const int &P=0,
            const double &Vx=0,const double &Vy=0,const double &th=0,const int &n=1)
            :type(t),width(wid),height(hei),powerofcollide(Pow),pos(PointD(X,Y)),life(Life),period(P),speed(PointD(Vx,Vy)),theta(th),bulletnum(n)
            {
               radius=std::min(width*1.0/2,height*1.0/2);shotperiod=0;
-              int properiod;
+              properiod=100;
+              thunder=100;
            }
     playerplane(){};
 };
-
-
 
 //碰撞效果对象
 struct flower

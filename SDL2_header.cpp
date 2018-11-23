@@ -24,9 +24,9 @@ std::string getResourcePath(const std::string &subDir){
 		size_t pos = baseRes.rfind("bin");
 		baseRes = baseRes.substr(0, pos) + "res" + PATH_SEP;
 	}
-	return subDir.empty() ? baseRes : baseRes + subDir + PATH_SEP;
+	std::cout<<(baseRes + subDir + PATH_SEP)<<std::endl;
+	return subDir.empty()? baseRes : baseRes + subDir + PATH_SEP;
 }
-
 
 // -------------pointd.h--------------
 double cross( const PointD &a, const PointD &b )
@@ -58,6 +58,7 @@ int keyValue;
 const unsigned int FPS_RATE = 60;
 const std::string RES_PATH_IMG	= getResourcePath("image");
 const std::string RES_PATH_FONT = getResourcePath("fonts");
+const std::string RES_PATH_MUSIC = getResourcePath("music");
 std::string	fontName = "msyh";
 int			fontSize = 25;
 uint8_t lastColor[4];
@@ -67,11 +68,9 @@ uint8_t lastColor[4];
  * @param os The output stream to write the message too
  * @param msg The error message to write, format will be msg error: SDL_GetError()
  */
-
 void logSDLError(std::ostream &os, const std::string &msg){
 	os << msg << " error: " << SDL_GetError() << std::endl;
 }
-
 /*
  * Loads an image into a texture on the rendering device
  * @param file The image file to load
@@ -131,7 +130,6 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y,
 	}
 	renderTexture(tex, ren, dst, angle, center, flip, clip);
 }
-
 /*
  * Render the message we want to display to a texture for drawing
  * @param message The message we want to display
@@ -140,7 +138,6 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y,
  * @param fontSize The size we want the font to be
  * @return An SDL_Texture containing the rendered message, or nullptr if something went wrong
  */
-
 SDL_Texture* renderText(const std::string &message, const std::string &fontFile, SDL_Color color,
 		int fontSize, SDL_Renderer *renderer)
 {
@@ -174,7 +171,6 @@ Image* textToImage( const std::string &msg,
 {
 	return renderText(msg, RES_PATH_FONT + fontType + ".ttf", color, size, renderer);
 }
-
 /*
  * Loads an image
  * @param file The image file to load
@@ -184,6 +180,7 @@ Image* loadImage( const std::string &file )
 {
 	return loadTexture( RES_PATH_IMG +file, renderer );
 }
+
 
 void setImageAlpha(Image *img,Uint8 alpha)
 {
@@ -312,7 +309,6 @@ int main(int argc, char* args[]){
 	bool quit = false;
 	t0 = SDL_GetTicks();
 	SDL_SetRenderDrawBlendMode( renderer, SDL_BLENDMODE_BLEND );
-
 //打开游戏，进行选择
  while(!quit){
    while (SDL_PollEvent(&event))
@@ -356,11 +352,9 @@ int main(int argc, char* args[]){
 					break;
 			}
 		}
-
         if(choice()){
            break;
         }
-
 		t1 = SDL_GetTicks();//总时间，单位为毫秒
 		delta = t1 - t0;
 		t0 = t1;
