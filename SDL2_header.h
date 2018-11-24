@@ -152,7 +152,6 @@ Image* textToImage( const std::string &msg,
  */
 Image* loadImage( const std::string &file );
 void setImageAlpha( Image *img, Uint8 alpha );
-
 /*
  * Draw image on the screen.
  * @param img The image we want to display
@@ -180,7 +179,6 @@ void drawLine( const Point &p1 ,const Point &p2 );
 void drawLines(const SDL_Point* points, int count);
 void drawRect( const Rect& rect, const bool& fill = false );
 void setCanvas( int x, int y, int width=SCREEN_WIDTH, int height=SCREEN_HEIGHT );
-
 // ---------------------------------------------------
 
 void drawText( const std::string &msg, const int &x, const int &y,
@@ -191,9 +189,15 @@ void drawText( const std::string &msg, const int &x, const int &y,
 
 // Functions for programming
 extern void initialize();
+extern void create_boss();
+extern bool Boss_exist;
 extern void newEnemy();
 extern int	work( bool &);
-extern int  choice();
+extern int	choice( bool &);
+extern int	showlose( bool &);
+extern int	showwin( bool &);
+extern int  SCORE;
+extern int  revive;
 extern void mousePress();
 extern void mouseMove();
 extern void mouseRelease();
@@ -201,6 +205,9 @@ extern void keyDown();
 extern void keyUp();
 extern void finale();
 extern void showresult();
+extern int Sound_Init();
+extern void load_all();
+extern void player_revive();
 int main(int argc, char* args[]);
 
 

@@ -1,7 +1,6 @@
 #include "res_path.h"
 #include "pointd.h"
 #include "SDL2_header.h"
-
 // -------------res_path.h------------
 std::string getResourcePath(const std::string &subDir){
 #ifdef _WIN32
@@ -27,16 +26,6 @@ std::string getResourcePath(const std::string &subDir){
 	std::cout<<(baseRes + subDir + PATH_SEP)<<std::endl;
 	return subDir.empty()? baseRes : baseRes + subDir + PATH_SEP;
 }
-
-// -------------pointd.h--------------
-double cross( const PointD &a, const PointD &b )
-{
-	return a.x*b.y - a.y*b.x;
-}
-double dot( const PointD &a, const PointD &b )
-{
-	return a.x*b.x + a.y*b.y;
-}
 // -----------SDL2_header.h------------
 namespace Game {
 SDL_Renderer	*renderer	= NULL;
@@ -55,7 +44,7 @@ int pmouseX = -1;
 int pmouseY = -1;
 bool keyPressed = false;
 int keyValue;
-const unsigned int FPS_RATE = 60;
+const unsigned int FPS_RATE =60;
 const std::string RES_PATH_IMG	= getResourcePath("image");
 const std::string RES_PATH_FONT = getResourcePath("fonts");
 const std::string RES_PATH_MUSIC = getResourcePath("music");
@@ -84,6 +73,7 @@ SDL_Texture* loadTexture(const std::string &file, SDL_Renderer *ren){
 	}
 	return texture;
 }
+
 /*
  * Draw an SDL_Texture to an SDL_Renderer at some destination rect
  * taking a clip of the texture if desired
@@ -100,6 +90,7 @@ void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, SDL_Rect dst,
 {
 	SDL_RenderCopyEx(ren, tex, clip, &dst, angle, center, flip );
 }
+
 /*
  * Draw an SDL_Texture to an SDL_Renderer at position x, y, preserving
  * the texture's width and height and taking a clip of the texture if desired
@@ -180,13 +171,10 @@ Image* loadImage( const std::string &file )
 {
 	return loadTexture( RES_PATH_IMG +file, renderer );
 }
-
-
 void setImageAlpha(Image *img,Uint8 alpha)
 {
 	SDL_SetTextureAlphaMod( img, alpha );
 }
-
 /*
  * Draw image on the screen.
  * @param img The image we want to display
@@ -252,10 +240,11 @@ void drawRect(const Rect& rect, const bool& fill)
 	else
 		SDL_RenderFillRect( renderer, &rect );
 }
-void setCanvas( int x, int y, int width, int height )
+
+void setCanvas(int x,int y,int width,int height )
 {
 	SDL_Rect rect = {x,y,x+width,y+height};
-	SDL_RenderSetViewport( renderer, &rect );
+	SDL_RenderSetViewport(renderer,&rect);
 }
 
 // ---------------------------------------------------
@@ -273,6 +262,7 @@ void drawText(const std::string &msg, const int &x, const int &y,
 
 int main(int argc, char* args[]){
 	using namespace Game;
+    char info[20];
 	//Start up SDL and make sure it went ok
 	if (SDL_Init(SDL_INIT_VIDEO) != 0){
 		logSDLError(std::cout, "SDL_Init");
@@ -301,81 +291,28 @@ int main(int argc, char* args[]){
 		SDL_Quit();
 		return 1;
 	}
+	//Initialize the Frequency and channel of audio.
+    Sound_Init();
+    if(SDL_Init(SDL_INIT_AUDIO)==-1) {
+        printf("SDL_Init: %s\n", SDL_GetError());
+        exit(1);
+    }
+    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT,2, 1024)==-1) {
+        printf("Mix_OpenAudio: %s\n", Mix_GetError());
+        exit(2);
+    }
 	initialize();
 	double deltaTime, delta, oneStepTime = 1./FPS_RATE;
 	unsigned int t0, t1;
-	int returnValue;
+	int returnValue=2;
 	SDL_Event event;
 	bool quit = false;
 	t0 = SDL_GetTicks();
 	SDL_SetRenderDrawBlendMode( renderer, SDL_BLENDMODE_BLEND );
-//打开游戏，进行选择
- while(!quit){
-   while (SDL_PollEvent(&event))
-		{
-			switch (event.type)
-			{
-				case SDL_QUIT :
-					quit = true;
-					break;
-				case SDL_MOUSEBUTTONDOWN:
-					mouseButton = event.button.button;
-					pmouseX = mouseX;
-					pmouseY = mouseY;
-					mouseX = event.button.x;
-					mouseY = event.button.y;
-					mousePressed = true;
-					mouseDragged = false;
-					mousePress();
-					break;
-				case SDL_MOUSEMOTION:
-					pmouseX = mouseX;
-					pmouseY = mouseY;
-					mouseX = event.motion.x;
-					mouseY = event.motion.y;
-					if (event.motion.state & SDL_BUTTON_LMASK || event.motion.state & SDL_BUTTON_RMASK)
-					{
-						mouseDragged = true;
-					}
-					mouseMove();
-					break;
-				case SDL_MOUSEBUTTONUP :
-					pmouseX = mouseX;
-					pmouseY = mouseY;
-					mouseX = event.button.x;
-					mouseY = event.button.y;
-					mousePressed = false;
-					mouseDragged = false;
-					mouseRelease();
-					break;
-				default:
-					break;
-			}
-		}
-        if(choice()){
-           break;
-        }
-		t1 = SDL_GetTicks();//总时间，单位为毫秒
-		delta = t1 - t0;
-		t0 = t1;
-		deltaTime = delta / 1000.0;
-		if (delta < oneStepTime*1000) {
-			SDL_Delay(oneStepTime*1000 - delta);
-			deltaTime = oneStepTime;
-		}
-        setPenColor(canvasColor);
-		setPenColor(lastColor[0],lastColor[1],lastColor[2],lastColor[3]);
-		SDL_RenderPresent(renderer);
-        SDL_RenderClear(renderer);
-}
-
-//进行游戏
+    //load all pictures and audio
+    load_all();
 	while(!quit)
 	{
-	    extern plane Player;
-	    if(Player.life<0){
-            break;
-	    }
 		while (SDL_PollEvent(&event))
 		{
 			switch (event.type)
@@ -427,109 +364,63 @@ int main(int argc, char* args[]){
 					break;
 			}
 		}
-		returnValue = work(quit);//先deal()，判断飞机是否移动，更新速度位置
-                                   //然后draw()，更新画面
-                                   //最后看是否按Esc退出
-		t1 = SDL_GetTicks();//总时间，单位为毫秒
+		switch(returnValue){
+          case -1:
+                 returnValue=showlose(quit);break;
+          case 0:
+                 returnValue=work(quit);break;
+          case 1:
+                 returnValue=showwin(quit);break;
+          case 2:
+                 returnValue=choice(quit);break;
+          case 4:
+                player_revive();returnValue=0;SDL_Delay(1000);break;
+          case 3:
+                 duration=0,duration_i=0;initialize();
+                 setPenColor(canvasColor);
+		         SDL_RenderPresent(renderer);
+                 setPenColor(lastColor[0],lastColor[1],lastColor[2],lastColor[3]);
+	           	 SDL_RenderClear(renderer);
+                 returnValue=0;   SDL_Delay(1000);
+	           	 continue;
+		}
+		t1 = SDL_GetTicks();
 		delta = t1 - t0;
 		t0 = t1;
-		deltaTime = delta / 1000.0;
+		deltaTime=delta/1000.0;
 		if (delta < oneStepTime*1000) {
 			SDL_Delay(oneStepTime*1000 - delta);
 			deltaTime = oneStepTime;
 		}
-		duration = duration + deltaTime;//总共经过的时间
+		duration = duration + deltaTime;
 		duration_i++;
-		//第一种生成敌人的尝试，每隔1000帧生成一个敌人
-		if(duration_i%100==1){
+		if(duration_i%50==1){
             newEnemy();
 		}
 		//Display Fps
-		nowFPS = 1.0 / deltaTime;
+		nowFPS =1.0/deltaTime;
 		if(FPS_DISPLAY)
 		{
-			char info[20];
 			sprintf(info, "FPS: %2d", (int)(nowFPS + 0.5));
 			drawText( info, 0, 0 );
+		}
+        if(returnValue==0){
+            sprintf(info, "TIME LEFT: %2d", (int)(100-duration));
+            drawText(info,100,0);
+            sprintf(info, "SCORE: %2d", (int)(SCORE));
+            drawText( info,300, 0 );
+            sprintf(info, "REST OF YOUR LIFE: %2d", revive);
+            drawText( info,300, 550 );
+            if(duration>50&&!Boss_exist)
+            {
+               create_boss();
+            }
 		}
 		//Draw the renderer
 		setPenColor(canvasColor);
 		SDL_RenderPresent(renderer);
 		setPenColor(lastColor[0],lastColor[1],lastColor[2],lastColor[3]);
 		SDL_RenderClear(renderer);
-}
-
-//结束游戏，现实结果
- while(!quit){
-   while (SDL_PollEvent(&event))
-		{
-			switch (event.type)
-			{
-				case SDL_QUIT :
-					quit = true;
-					break;
-				case SDL_KEYDOWN :
-					keyValue = event.key.keysym.sym;
-					keyPressed = true;
-					keyDown();
-					break;
-				case SDL_KEYUP:
-					keyValue = event.key.keysym.sym;
-					keyPressed = false;
-					keyUp();
-					break;
-				case SDL_MOUSEBUTTONDOWN:
-					mouseButton = event.button.button;
-					pmouseX = mouseX;
-					pmouseY = mouseY;
-					mouseX = event.button.x;
-					mouseY = event.button.y;
-					mousePressed = true;
-					mouseDragged = false;
-					mousePress();
-					break;
-				case SDL_MOUSEMOTION:
-					pmouseX = mouseX;
-					pmouseY = mouseY;
-					mouseX = event.motion.x;
-					mouseY = event.motion.y;
-					if (event.motion.state & SDL_BUTTON_LMASK || event.motion.state & SDL_BUTTON_RMASK)
-					{
-						mouseDragged = true;
-					}
-					mouseMove();
-					break;
-				case SDL_MOUSEBUTTONUP :
-					pmouseX = mouseX;
-					pmouseY = mouseY;
-					mouseX = event.button.x;
-					mouseY = event.button.y;
-					mousePressed = false;
-					mouseDragged = false;
-					mouseRelease();
-					break;
-				default:
-					break;
-			}
-		}
-        //returnValue = showresult();;//先deal()，判断飞机是否移动，更新速度位置
-                                   //然后draw()，更新画面
-                                   //最后看是否按Esc退出
-		t1 = SDL_GetTicks();//总时间，单位为毫秒
-		delta = t1 - t0;
-		t0 = t1;
-		deltaTime = delta / 1000.0;
-		if (delta < oneStepTime*1000) {
-			SDL_Delay(oneStepTime*1000 - delta);
-			deltaTime = oneStepTime;
-		}
-		duration = duration + deltaTime;//总共经过的时间
-		duration_i++;
-        showresult();
-        setPenColor(canvasColor);
-		setPenColor(lastColor[0],lastColor[1],lastColor[2],lastColor[3]);
-		SDL_RenderPresent(renderer);
-        SDL_RenderClear(renderer);
 }
 	finale();
 	cleanup( window, renderer);
