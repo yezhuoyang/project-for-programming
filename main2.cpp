@@ -13,7 +13,6 @@ PointD velocityPlayer;
 double velocityBullet;
 double velocityEnemyBullet;
 double speedPlayer;
-double radiusPlayer=30,radiusEnemy=30;//玩家飞机与敌机的半径
 int lifeofPlayer;//玩家的生命值
 double lifeofEnemy;//玩家的生命值
 int powerofPlayer;//玩家子弹的攻击力
@@ -43,9 +42,9 @@ bossplane Boss;
 int lastAnime=0;
 int Sound_Init()
 {
-        int    TMP_FREQ = MIX_DEFAULT_FREQUENCY*32;
+        int    TMP_FREQ = MIX_DEFAULT_FREQUENCY;
         const Uint16 TMP_FORMAT = MIX_DEFAULT_FORMAT;
-        const int    TMP_CHAN =1000;
+        const int    TMP_CHAN =2;
         const int    TMP_CHUNK_SIZE = 512;
         return Mix_OpenAudio(TMP_FREQ,TMP_FORMAT,TMP_CHAN,TMP_CHUNK_SIZE);
 }
@@ -58,6 +57,8 @@ template <typename T>
 void renewcenter(T &A){
        A.center.x=A.pos.x+A.width/2;A.center.y=A.pos.y+A.height/2;
 }
+
+
 int choice(bool & quit)
 {
   bool start=false;
@@ -75,6 +76,14 @@ int choice(bool & quit)
 	getImageSize( text, w, h );
 	drawImage( text,200,330, 1, 1,0);
 	cleanup(text);
+
+    text = textToImage("THUNDER-BE A MAN AND HOLD 100 SECONDS!");
+	getImageSize( text, w, h );
+	drawImage( text,50,130, 1, 1,0);
+	cleanup(text);
+
+
+
     mouse.pos=PointD(mouseX, mouseY);
 	getImageSize(imagemouse, w, h );
 	lastAnime = (lastAnime+15)%(4*60);
@@ -172,23 +181,23 @@ void initialize()
     gameover=false;
     lifeofPlayer=500;//玩家初始生命值
 	Player.pos.x=SCREEN_WIDTH/2;Player.pos.y=SCREEN_HEIGHT/2;Player.life=lifeofPlayer;
-	Player.type=0;Player.bulletnum=3;Player.properiod=1000;
+	Player.type=0;Player.bulletnum=1;Player.properiod=500;
 	Player.width=50;Player.height=50;
     renewcenter(Player);
-	powerofPlayer=50000;//玩家子弹的攻击力
+	powerofPlayer=10;
 	powerofBoss=50;
-	lifeofBoss=100000;
-    powerofcollide=100;
+	lifeofBoss=15000;
+    powerofcollide=30;
 	Player.powerofcollide=powerofcollide;
     speedPlayer=10;
-    sanperiod=1000;
+    sanperiod=500;
     leiperiod=100;
-    powerofthunder=1000;
+    powerofthunder=1;
 	FPS_DISPLAY = true;
-	velocityBullet=-5;
-	velocityEnemyBullet=-10;
-	lifeofEnemy=100;//敌人初始生命值
-    powerofEnemy=1;//玩家子弹的攻击力
+	velocityBullet=-3;
+	velocityEnemyBullet=-4;
+	lifeofEnemy=200;
+    powerofEnemy=5;
 	canvasColor = {0, 0, 0, 255};
     srand((unsigned)time(NULL));
 }
@@ -237,7 +246,7 @@ void draw_Boss()
 }
 
 void Boss_shoot(){
-        if(Boss.period%10==1){
+        if(Boss.period%8==1){
             int k=-(Boss.bulletnum-1)/2;
             for(int i=0;i<Boss.bulletnum;++i){
                bullet tmp(1,50,50,powerofBoss,Boss.center.x,Boss.center.y,1,3*k,-velocityBullet*2);
@@ -246,7 +255,6 @@ void Boss_shoot(){
             }
         }
 }
-
 
 void Boss_move(){
     if(Boss.center.y>50){
@@ -288,7 +296,7 @@ void Player_shoot(){
             }
             int k=-(Player.bulletnum-1)/2;
             for(int i=0;i<Player.bulletnum;++i){
-               bullet tmp(0,50,50,powerofPlayer,Player.center.x,Player.center.y,1,3*k,velocityBullet*5);
+               bullet tmp(0,50,50,powerofPlayer,Player.center.x,Player.center.y,1,3*k,velocityBullet*2);
                PlayerBullet.push_back(tmp);
                k++;
             }
@@ -564,8 +572,6 @@ void leiji_all(){
     }
 }
 
-
-
 //Collide bullets with planes, planes with planes.
 void collide_all(){
     //When 'R' is pressed, the umbrella is on, all the bullets are bounced back
@@ -579,7 +585,8 @@ void collide_all(){
        for(std::vector<bullet>::iterator iter=EnemyBullet.begin();iter!=EnemyBullet.end();)
         {
             if(((*iter).center-Player.center).length()<=130){
-                (*iter).speed.y=(*iter).speed.y*-1;
+                (*iter).speed=(*iter).speed*-1;
+                (*iter).powerofcollide=(*iter).powerofcollide/3;
                 PlayerBullet.push_back(*iter);
                 EnemyBullet.erase(iter);
                 continue;
@@ -624,7 +631,6 @@ void collide_all(){
         }
 	}
 }
-
 
 //When a plane or bullet dies, a spark is created.
 void create_flower(){
@@ -725,7 +731,6 @@ void clear_all(){
     }
 }
 
-
 void bullet_move(){
    for(std::vector<bullet>::iterator iter=EnemyBullet.begin();iter!=EnemyBullet.end();++iter)
     {
@@ -747,7 +752,7 @@ void deal()
 	san=false;
 	//whether the thunder is on.
 	lei=false;
-	if(keyboard['k']&&Player.period%5==1)
+	if(keyboard['k']&&Player.period%10==1)
     {
           if(keyboard['k']){
             effect_Play(0,0);
@@ -895,6 +900,7 @@ void finale()
     }
     Mix_CloseAudio();
 }
+
 //Revive the player.
 void player_revive()
 {
@@ -922,7 +928,7 @@ int showwin( bool &quit )
     Image *text = textToImage("RETRY?");
 	int w,h;
 	getImageSize( text, w, h );
-	drawImage( text,100,300, 1, 1,0);
+	drawImage( text,150,350, 1, 1,0);
 	cleanup(text);
     mouse.pos=PointD(mouseX, mouseY);
 	getImageSize(imagemouse, w, h );
@@ -956,7 +962,7 @@ int showlose( bool &quit )
     Image *text = textToImage("RETRY?");
 	int w,h;
 	getImageSize( text, w, h );
-	drawImage( text,100,300, 1, 1,0);
+	drawImage( text,150,350, 1, 1,0);
 	cleanup(text);
     mouse.pos=PointD(mouseX, mouseY);
 	getImageSize(imagemouse, w, h );

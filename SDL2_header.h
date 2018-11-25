@@ -50,8 +50,6 @@ namespace Game {
 #define MOUSE_LEFT   SDL_BUTTON_LEFT
 #define MOUSE_MIDDLE SDL_BUTTON_MIDDLE
 #define MOUSE_RIGHT  SDL_BUTTON_RIGHT
-
-
 extern SDL_Renderer	*renderer;
 extern SDL_Window	*window;
 extern bool FPS_DISPLAY;

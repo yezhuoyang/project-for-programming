@@ -416,6 +416,10 @@ int main(int argc, char* args[]){
                create_boss();
             }
 		}
+
+		if(returnValue==0&&duration>100){
+            returnValue=-1;
+		}
 		//Draw the renderer
 		setPenColor(canvasColor);
 		SDL_RenderPresent(renderer);
